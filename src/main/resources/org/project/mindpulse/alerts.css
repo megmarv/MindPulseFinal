@@ -1,0 +1,36 @@
+.alert {
+    -fx-background-color: white; /* Light background */
+    -fx-border-color: black; /* Border color */
+    -fx-border-width: 3px; /* Border thickness */
+    -fx-font-family: Arial, sans-serif;
+}
+
+.alert .dialog-pane {
+    -fx-padding: 20px; /* Padding for the dialog */
+}
+
+.alert .header-panel {
+    -fx-background-color: #007bff; /* Blue header */
+    -fx-text-fill: white; /* Text color for header */
+}
+
+.alert .content {
+    -fx-font-size: 14px; /* Font size for content */
+    -fx-text-fill: black; /* Text color */
+}
+
+.alert .button-bar {
+    -fx-background-color: white; /* Background for button area */
+}
+
+.alert .button{
+    -fx-background-color: black;
+    -fx-border-color: white;
+    -fx-text-fill: white;
+}
+
+.alert .button:hover{
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-border-color: black;
+}
