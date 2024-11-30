@@ -30,33 +30,33 @@
                         <Font name="Tahoma Bold" size="17.0" />
                     </font>
                 </Label>
-                <TextField fx:id="nameField" layoutX="65.0" layoutY="70.0" prefHeight="30.0" prefWidth="220.0" promptText="First name" styleClass="textfield">
+                <TextField fx:id="nameForRegister" layoutX="65.0" layoutY="70.0" prefHeight="30.0" prefWidth="220.0" promptText="First name" styleClass="textfield">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </TextField>
-                <TextField fx:id="emailField" layoutX="65.0" layoutY="114.0" prefHeight="30.0" prefWidth="220.0" promptText="email" styleClass="textfield">
+                <TextField fx:id="emailForRegister" layoutX="65.0" layoutY="114.0" prefHeight="30.0" prefWidth="220.0" promptText="email" styleClass="textfield">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </TextField>
-                <TextField fx:id="usernameField" layoutX="65.0" layoutY="157.0" prefHeight="30.0" prefWidth="220.0" promptText="username" styleClass="textfield">
+                <TextField fx:id="usernameForRegister" layoutX="65.0" layoutY="157.0" prefHeight="30.0" prefWidth="220.0" promptText="username" styleClass="textfield">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </TextField>
-                <PasswordField fx:id="passwordField" layoutX="65.0" layoutY="200.0" prefHeight="30.0" prefWidth="220.0" promptText="password" styleClass="textfield">
+                <PasswordField fx:id="passwordForRegister" layoutX="65.0" layoutY="200.0" prefHeight="30.0" prefWidth="220.0" promptText="password" styleClass="textfield">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </PasswordField>
-                <Button fx:id="createAccountButton" layoutX="65.0" layoutY="249.0" mnemonicParsing="false" onAction="#createNewAccount" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Create account" />
+                <Button fx:id="register" layoutX="65.0" layoutY="249.0" mnemonicParsing="false" onAction="#createNewAccount" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Create account" />
                 <Label layoutX="89.0" layoutY="314.0" text="Already have an account ?" textFill="#368981">
                     <font>
                         <Font name="Tahoma Bold" size="13.0" />
                     </font>
                 </Label>
-                <Button fx:id="goToLoginPage" layoutX="65.0" layoutY="339.0" mnemonicParsing="false" onAction="#redirectToLogInPage" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Sign In" />
+                <Button fx:id="goToLogin" layoutX="65.0" layoutY="339.0" mnemonicParsing="false" onAction="#redirectToLogInPage" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Sign In" />
                 <Button fx:id="exit" mnemonicParsing="false" onAction="#Exit" prefHeight="26.0" prefWidth="36.0" styleClass="close" text="X" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
                     <font>
                         <Font name="System Bold" size="12.0" />

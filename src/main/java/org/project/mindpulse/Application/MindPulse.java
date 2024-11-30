@@ -1,5 +1,6 @@
 package org.project.mindpulse.Application;
 
+import org.project.mindpulse.CoreModules.population;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
