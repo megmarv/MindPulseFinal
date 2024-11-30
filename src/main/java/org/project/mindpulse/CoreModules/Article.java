@@ -15,7 +15,7 @@ public class Article {
 
     private Category category; // aggregation pointer
 
-    private List<ArticleRecord> articleHistory;
+    private List<ArticleRecord> articleHistory = new ArrayList<>();
 
     public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish) {
         this.articleId = articleId;
@@ -92,3 +92,4 @@ public class Article {
         this.dateOfPublish = dateOfPublish;
     }
 }
+

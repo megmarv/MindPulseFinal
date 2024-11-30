@@ -12,7 +12,7 @@ public class Category {
     // Static list to hold predefined categories
     private static final List<Category> categories = new ArrayList<>();
 
-    private List<Article> articlesForThisCategory;  // aggregation pointer
+    private List<Article> articlesForThisCategory = new ArrayList<Article>();  // aggregation pointer
 
     public void addArticle(Article article) {
         articlesForThisCategory.add(article);

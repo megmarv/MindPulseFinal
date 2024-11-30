@@ -10,14 +10,33 @@ public class ArticleRecord {
     private boolean disliked;
     private long timeTakenMillis;
 
-    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId) {
+    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, String rating, long timeTakenMillis) {
+        this.interactionId = interactionId;
+        this.articleID = articleID;
+        this.categoryId = categoryId;
+        this.userId = userId;
+
+        if(this.liked==true){
+            rating = "liked";
+        }
+        else if(this.disliked==true){
+            rating = "disliked";
+        }
+        else{
+            rating = "none";
+        }
+
+        this.timeTakenMillis = timeTakenMillis;
+    }
+
+    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId,long timeTakenMillis) {
         this.interactionId = interactionId;
         this.articleID = articleID;
         this.categoryId = categoryId;
         this.userId = userId;
         this.liked = false;
         this.disliked = false;
-        this.timeTakenMillis = System.currentTimeMillis();
+        this.timeTakenMillis = timeTakenMillis;
     }
 
     public int getInteractionId() {

@@ -8,8 +8,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import org.project.mindpulse.CoreModules.Article;
 
 import java.io.IOException;
 
@@ -17,14 +17,15 @@ public class FirstPageController {
 
     @FXML private Button user;
     @FXML private Button admin;
+    @FXML private Button exit;
 
     @FXML
     private void redirectToUserLogInPage(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/UserLogin.fxml"));
-        Parent MainMenuWindow = loader.load();
+        Parent MainMenuWindow1 = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setTitle("Sign in");
-        Scene scene = new Scene(MainMenuWindow, 600, 400);
+        Scene scene = new Scene(MainMenuWindow1, 600, 400);
         stage.setScene(scene);
         stage.show();
     }
@@ -32,10 +33,10 @@ public class FirstPageController {
     @FXML
     private void redirectToAdminLoginPage(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/AdminLogin.fxml"));
-        Parent MainMenuWindow = loader.load();
+        Parent MainMenuWindow2 = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setTitle("Sign in");
-        Scene scene = new Scene(MainMenuWindow, 600, 400);
+        Scene scene = new Scene(MainMenuWindow2, 600, 400);
         stage.setScene(scene);
         stage.show();
     }

@@ -1,6 +1,5 @@
 package org.project.mindpulse.CoreModules;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,19 +13,54 @@ public class User {
 
     private List<ArticleRecord> userHistory = new ArrayList<>(); // aggregation between user and ArticleRecord
 
-    private List<String> preferredCategories = new ArrayList<String>();
+    // composition relationship
+    private List<UserPreferences> preferredCategories = new ArrayList<>();
 
     public void addArticleRecord(ArticleRecord articleRecord) {
         userHistory.add(articleRecord);
         // considering articleRecord.setUser(this) but would make it a composition
     }
 
-    public void addPreference(String favouriteCategory) {
-        preferredCategories.add(favouriteCategory);
+    // Add a new preference
+    public void addPreference(int categoryId, int likes, int dislikes, int nullInteractions) {
+        // Check if the category already exists
+        for (UserPreferences pref : preferredCategories) {
+            if (pref.getCategoryId() == categoryId) {
+                System.out.println("Category " + categoryId + " already exists. Use updatePreference instead.");
+                return;
+            }
+        }
+        // Add new preference
+        UserPreferences newPreference = new UserPreferences(categoryId, likes, dislikes, nullInteractions);
+        preferredCategories.add(newPreference);
     }
 
-    public void removePreference(String favouriteCategory) {
-        preferredCategories.remove(favouriteCategory);
+    // Update an existing preference
+    public void updatePreference(int categoryId, int likes, int dislikes, int nullInteractions) {
+        for (UserPreferences pref : preferredCategories) {
+            if (pref.getCategoryId() == categoryId) {
+                pref.setLikes(likes);
+                pref.setDislikes(dislikes);
+                pref.setNullInteractions(nullInteractions);
+                return;
+            }
+        }
+        System.out.println("Category " + categoryId + " does not exist. Use addPreference instead.");
+    }
+
+    // Get a specific preference
+    public UserPreferences getPreference(int categoryId) {
+        for (UserPreferences pref : preferredCategories) {
+            if (pref.getCategoryId() == categoryId) {
+                return pref;
+            }
+        }
+        return null;
+    }
+
+    // Get all preferences
+    public List<UserPreferences> getAllPreferences() {
+        return new ArrayList<>(preferredCategories); // Return a copy to prevent external modification
     }
 
     // constructor without providing the userHistory and preferredCategories array lists
@@ -52,7 +86,7 @@ public class User {
     }
 
     // completely parameterized constructor
-    public User(int userId, String name, String email, String username,String password, List<ArticleRecord> articleRecords, List<String> favouriteCategories) {
+    public User(int userId, String name, String email, String username,String password, List<ArticleRecord> articleRecords, List<UserPreferences> favouriteCategories) {
         this.userId = userId;
         this.name = name;
         this.email = email;
@@ -106,11 +140,7 @@ public class User {
         this.password = password;
     }
 
-    public List<String> getPreferredCategories() {
-        return preferredCategories;
-    }
-
-    public void setPreferredCategories(List<String> preferredCategories) {
-        this.preferredCategories = preferredCategories;
+    public void setUserHistory(List<ArticleRecord> userHistory) {
+        this.userHistory = userHistory;
     }
 }
