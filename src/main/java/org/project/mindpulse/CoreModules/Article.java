@@ -91,5 +91,13 @@ public class Article {
     public void setDateOfPublish(Date dateOfPublish) {
         this.dateOfPublish = dateOfPublish;
     }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setArticleHistory(List<ArticleRecord> articleHistory) {
+        this.articleHistory = articleHistory;
+    }
 }
 

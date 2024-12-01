@@ -19,16 +19,30 @@ public class population{
             statement.setInt(1, user.getUserId());
             ResultSet resultSet = statement.executeQuery();
 
+            boolean liked;
+            boolean disliked;
+
             while (resultSet.next()) {
                 int interactionId = resultSet.getInt("interactionId");
                 int articleId = resultSet.getInt("articleId");
                 int categoryId = resultSet.getInt("categoryId");
                 int userId = resultSet.getInt("userId");
                 String rating = resultSet.getString("rating");
+
+                // Initialize booleans based on rating
+                liked = false;
+                disliked = false;
+
+                if (rating.equals("liked")) {
+                    liked = true;
+                } else if (rating.equals("disliked")) {
+                    disliked = true;
+                }
+
                 long timeTaken = resultSet.getLong("timeTaken");
 
                 // Create ArticleRecord object
-                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId, rating, timeTaken);
+                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId, liked, disliked, timeTaken);
 
                 // Use the addArticleRecord method to associate the record with the user
                 user.addArticleRecord(record);  // This method will add the record to the user's history
@@ -37,7 +51,6 @@ public class population{
             e.printStackTrace();
         }
     }
-
 
     // Method to populate all user preferences
     public void populateUserPreferences(User user) {
@@ -93,42 +106,23 @@ public class population{
                 String rating = resultSet.getString("rating");
                 long timeTakenMillis = resultSet.getLong("timeTaken");
 
+                // Initialize booleans based on rating
+                boolean liked = false;
+                boolean disliked = false;
+
+                if (rating.equals("liked")) {
+                    liked = true;
+                } else if (rating.equals("disliked")) {
+                    disliked = true;
+                }
+
                 // Create an ArticleRecord based on the result set values
-                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId,rating, timeTakenMillis);
+                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId, liked, disliked, timeTakenMillis);
 
                 // Use the addArticleRecord method from the Article class to add the record
                 article.addArticleRecord(record);
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    // Method to populate articles for a specific category
-    public void populateArticlesForCategory(Category category) {
-        String query = "SELECT * FROM Articles WHERE categoryId = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setInt(1, category.getCategoryID());
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                int articleId = resultSet.getInt("articleId");
-                int categoryId = resultSet.getInt("categoryId");
-                String title = resultSet.getString("title");
-                String authorName = resultSet.getString("authorName");
-                String content = resultSet.getString("content");
-                Date dateOfPublish = resultSet.getDate("dateOfPublish");
-
-                // Create Article object
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
-
-                // Use the addArticle method to associate the article with the category
-                category.addArticle(article);  // This method will add the article to the category's list and set the category
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

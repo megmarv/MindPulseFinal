@@ -45,7 +45,7 @@
                         <Font name="Tahoma Bold" size="13.0" />
                     </font>
                 </Label>
-                <Button fx:id="goToRegistration" layoutX="65.0" layoutY="296.0" mnemonicParsing="false" onAction="#redirectToCreateAccountPage" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Create account" />
+                <Button fx:id="goToRegistration" layoutX="65.0" layoutY="296.0" mnemonicParsing="false" onAction="#redirectToRegistration" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Create account" />
                 <Button fx:id="exit" layoutX="314.0" layoutY="1.0" mnemonicParsing="false" onAction="#Exit" prefHeight="26.0" prefWidth="36.0" styleClass="close" text="X" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
                     <font>
                         <Font name="System Bold" size="12.0" />

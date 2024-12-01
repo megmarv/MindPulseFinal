@@ -1,16 +1,22 @@
 package org.project.mindpulse.Controllers;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import org.project.mindpulse.CoreModules.User;
+import org.project.mindpulse.Database.UserHandler;
 
 import java.io.IOException;
 
-public class UserController implements GeneralFeatures {
+public class UserController extends UserHandler implements GeneralFeatures{
 
     @FXML private Button login;
     @FXML private Button register;
@@ -25,6 +31,89 @@ public class UserController implements GeneralFeatures {
     @FXML private TextField emailForRegister;
     @FXML private TextField usernameForRegister;
     @FXML private PasswordField passwordForRegister;
+
+    // Static field to hold the currently logged-in user
+    private static User loggedInUser = null;
+
+    // Getter for the logged-in user
+    public static User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    // Method to log out the user
+    public static void logoutUser() {
+        loggedInUser = null;
+        System.out.println("User logged out.");
+    }
+
+    @FXML
+    public void login(ActionEvent event) throws IOException {
+        String username = this.usernameForLogin.getText();
+        String password = this.passwordForLogin.getText();
+
+        if (userExists(username)) {  // Check if the user exists
+            if (passwordCorrect(username, password)) {  // Check if the password is correct
+                displayConfirmation("You have successfully logged in!");
+
+                // Retrieve user details and create a User object
+                User user = getUserDetails(username);  // Retrieve user details from the database or another source
+                loggedInUser = user;
+                System.out.println("User logged in: " + user.getUsername());
+
+                // Redirect to the home page and pass the user details
+                redirectToHomePage(event, user);
+            } else {
+                displayError("Password is incorrect, please try again.");
+            }
+        } else {
+            displayError("User does not exist, please try again.");
+        }
+    }
+
+
+    @FXML
+    public void register(ActionEvent event) throws IOException {
+        String name = this.nameForRegister.getText().trim();
+        String email = this.emailForRegister.getText().trim();
+        String username = this.usernameForRegister.getText().trim();
+        String password = this.passwordForRegister.getText().trim();
+
+        // Validations
+        if (!name.matches("^[a-zA-Z ]{1,30}$")) {
+            displayError("Name should only contain letters and be less than 30 characters");
+            return;
+        }
+
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$") || email.length() > 30) {
+            displayError("Email should be a valid Gmail address and less than 30 characters");
+            return;
+        }
+
+        if (username.length() > 30) {
+            displayError("Username should be less than 30 characters");
+            return;
+        }
+
+        if (!password.matches("^(?=.*[a-zA-Z])(?=.*\\d).{1,30}$")) {
+            displayError("Password should be less than 30 characters and be a mix of letters and numbers");
+            return;
+        }
+
+        // Check if user already exists
+        if (userExists(username)) {
+            displayError("User already exists, please try again");
+            return;
+        }
+
+        // Attempt to create the user
+        if (createUser(name, email, username, password)) {
+            displayConfirmation("You have successfully created an account! You can login now");
+            redirectToLogInPage(event); // Redirect to the login page after successful registration
+        } else {
+            displayError("An error occurred. Please try again");
+        }
+    }
+
 
 
     @FXML
@@ -50,6 +139,44 @@ public class UserController implements GeneralFeatures {
 
         Platform.exit();
 
+    }
+
+    @FXML
+    private void redirectToHomePage(ActionEvent event, User user) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/Home.fxml"));
+        Parent mainMenuWindow = loader.load();
+
+        // Get the HomeController instance and pass the user details
+        HomeController homeController = loader.getController();
+        homeController.updateUserLabel(user.getName()); // Update the home screen with user's name
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle("Home");
+        Scene scene = new Scene(mainMenuWindow, 1100, 600);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
+    private void redirectToRegistration(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/NewUserAccount.fxml"));
+        Parent MainMenuWindow = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle("Create Account");
+        Scene scene = new Scene(MainMenuWindow, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
+    private void redirectToLogInPage(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/UserLogin.fxml"));
+        Parent MainMenuWindow = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle("Sign in");
+        Scene scene = new Scene(MainMenuWindow, 600, 400);
+        stage.setScene(scene);
+        stage.show();
     }
 
 }

@@ -10,35 +10,23 @@ public class ArticleRecord {
     private boolean disliked;
     private long timeTakenMillis;
 
-    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, String rating, long timeTakenMillis) {
+    // Constructor with rating as a boolean
+    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, boolean liked, boolean disliked, long timeTakenMillis) {
         this.interactionId = interactionId;
         this.articleID = articleID;
         this.categoryId = categoryId;
         this.userId = userId;
-
-        if(this.liked==true){
-            rating = "liked";
-        }
-        else if(this.disliked==true){
-            rating = "disliked";
-        }
-        else{
-            rating = "none";
-        }
-
+        this.liked = liked;
+        this.disliked = disliked;
         this.timeTakenMillis = timeTakenMillis;
     }
 
-    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId,long timeTakenMillis) {
-        this.interactionId = interactionId;
-        this.articleID = articleID;
-        this.categoryId = categoryId;
-        this.userId = userId;
-        this.liked = false;
-        this.disliked = false;
-        this.timeTakenMillis = timeTakenMillis;
+    // Constructor without a rating (defaults to 'none')
+    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, long timeTakenMillis) {
+        this(interactionId, articleID, categoryId, userId, false, false, timeTakenMillis);
     }
 
+    // Getters and setters for your fields
     public int getInteractionId() {
         return interactionId;
     }
@@ -95,4 +83,21 @@ public class ArticleRecord {
         this.timeTakenMillis = timeTakenMillis;
     }
 
+    public String getTimeTakenAsInterval() {
+        long seconds = timeTakenMillis / 1000;
+        return seconds + " seconds";
+    }
+
+    @Override
+    public String toString() {
+        return "ArticleRecord{" +
+                "interactionId=" + interactionId +
+                ", articleID=" + articleID +
+                ", categoryId=" + categoryId +
+                ", userId=" + userId +
+                ", liked=" + liked +
+                ", disliked=" + disliked +
+                ", timeTakenMillis=" + timeTakenMillis +
+                '}';
+    }
 }

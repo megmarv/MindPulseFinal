@@ -50,7 +50,7 @@
                         <Font size="14.0" />
                     </font>
                 </PasswordField>
-                <Button fx:id="register" layoutX="65.0" layoutY="249.0" mnemonicParsing="false" onAction="#createNewAccount" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Create account" />
+                <Button fx:id="register" layoutX="65.0" layoutY="249.0" mnemonicParsing="false" onAction="#register" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Create account" />
                 <Label layoutX="89.0" layoutY="314.0" text="Already have an account ?" textFill="#368981">
                     <font>
                         <Font name="Tahoma Bold" size="13.0" />

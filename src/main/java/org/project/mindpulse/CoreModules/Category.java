@@ -60,4 +60,11 @@ public class Category {
         this.categoryDescription = categoryDescription;
     }
 
+    public static List<Category> getCategories() {
+        return categories;
+    }
+
+    public List<Article> getArticlesForThisCategory() {
+        return articlesForThisCategory;
+    }
 }
