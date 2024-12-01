@@ -12,18 +12,20 @@ public class Article {
     private String authorName;
     private String content;
     private Date dateOfPublish;
+    private String linkToArticle;
 
     private Category category; // aggregation pointer
 
     private List<ArticleRecord> articleHistory = new ArrayList<>();
 
-    public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish) {
+    public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish, String linkToArticle) {
         this.articleId = articleId;
         this.categoryId = categoryId;
         this.title = title;
         this.authorName = authorName;
         this.content = content;
         this.dateOfPublish = dateOfPublish;
+        this.linkToArticle = linkToArticle;
         this.articleHistory = new ArrayList<>();
     }
 
@@ -42,6 +44,14 @@ public class Article {
 
     public List<ArticleRecord> getArticleHistory() {
         return articleHistory;
+    }
+
+    public String getLinkToArticle() {
+        return linkToArticle;
+    }
+
+    public void setLinkToArticle(String linkToArticle) {
+        this.linkToArticle = linkToArticle;
     }
 
     public int getArticleId() {

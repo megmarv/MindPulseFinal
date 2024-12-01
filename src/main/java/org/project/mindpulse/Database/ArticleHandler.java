@@ -72,9 +72,10 @@ public class ArticleHandler{
                 String authorName = resultSet.getString("authorName");
                 String content = resultSet.getString("content");
                 Date dateOfPublish = resultSet.getDate("dateOfPublish");
+                String link = resultSet.getString("link");
 
                 // Create an Article object
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish,link);
 
                 // Add the article to the category's list
                 category.addArticle(article);

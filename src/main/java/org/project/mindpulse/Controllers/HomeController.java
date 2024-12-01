@@ -132,6 +132,7 @@ public class HomeController extends ArticleHandler{
         java.net.URL cssUrl = getClass().getResource("/org/project/mindpulse/articleStyles.css");
 
         // HTML content with CSS link
+        // Corrected HTML content with CSS link
         String articleContent = "<html><head>" +
                 "<link rel='stylesheet' type='text/css' href='" + cssUrl.toExternalForm() + "' />" +
                 "</head><body>" +
@@ -139,10 +140,13 @@ public class HomeController extends ArticleHandler{
                 "<p><strong>Author :</strong> " + article.getAuthorName() + "</p>" +
                 "<p><strong>Published on :</strong> " + article.getDateOfPublish() + "</p>" +
                 "<p class='content'>" + article.getContent() + "</p>" +
+                "<p>View the full article here: " +
+                "<a href='" + article.getLinkToArticle() + "' target='_blank'>" + article.getLinkToArticle() + "</a></p>" +
                 "</body></html>";
 
         // Load content into WebView
         webview.getEngine().loadContent(articleContent);
+
     }
 
     private void recordInteraction(Article article) {
