@@ -5,6 +5,10 @@ module org.project.mindpulse {
     requires jdk.compiler;
     requires javafx.web;
     requires org.json;
+    requires org.postgresql.jdbc;
+    requires smile.core;
+    requires smile.math;
+    requires smile.data;
 
 
     opens org.project.mindpulse.Controllers to javafx.fxml;

@@ -16,6 +16,13 @@
   <dependencies>
 
     <dependency>
+      <groupId>com.github.haifengl</groupId>
+      <artifactId>smile-core</artifactId>
+      <version>2.5.3</version> <!-- Make sure to check for the latest version -->
+    </dependency>
+
+
+    <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>22.0.1</version>

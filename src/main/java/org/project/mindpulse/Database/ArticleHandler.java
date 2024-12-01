@@ -1,11 +1,15 @@
 package org.project.mindpulse.Database;
 
+import org.project.mindpulse.Controllers.UserController;
 import org.project.mindpulse.CoreModules.Article;
 import org.project.mindpulse.CoreModules.ArticleRecord;
 import org.project.mindpulse.CoreModules.Category;
 import org.project.mindpulse.CoreModules.User;
+import org.project.mindpulse.Service.RecommendationEngine;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArticleHandler{
 
@@ -72,7 +76,7 @@ public class ArticleHandler{
                 String authorName = resultSet.getString("authorName");
                 String content = resultSet.getString("content");
                 Date dateOfPublish = resultSet.getDate("dateOfPublish");
-                String link = resultSet.getString("link");
+                String link = resultSet.getString("linkToArticle");
 
                 // Create an Article object
                 Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish,link);
@@ -97,6 +101,68 @@ public class ArticleHandler{
     }
 
 
+    public boolean hasUserInteracted(int userId, int articleId) {
+        String query = "SELECT COUNT(*) FROM ARTICLEINTERACTIONS WHERE userid = ? AND articleid = ?";
 
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, userId);
+            statement.setInt(2, articleId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // If the count is greater than 0, the user has already interacted with the article
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking user interaction: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false; // User has not interacted with the article
+    }
+
+    // Refactor of retrieveAllArticles() method to correctly handle the ResultSet and add articles to static list
+    public static void retrieveAllArticles() {
+        System.out.println("Retrieving all articles from the database...");
+
+        String query = "SELECT * FROM articles"; // Query to retrieve all articles
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet rs = statement.executeQuery()) { // Execute the query
+
+            // Clear the existing list to avoid duplicates
+            Article.articleList.clear();
+
+            // Iterate over the result set and populate the static article list
+            while (rs.next()) {
+                int articleId = rs.getInt("articleid");
+                int categoryId = rs.getInt("categoryid");
+                String title = rs.getString("title");
+                String authorName = rs.getString("authorname");
+                String content = rs.getString("content");
+                Date dateOfPublish = rs.getDate("dateofpublish");
+                String link = rs.getString("linkToArticle");
+
+                // Create a new Article object and add it to the static list
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish,link);
+                Article.articleList.add(article); // Add the article to the static list
+
+                System.out.println("Added Article: " + article); // Log each added article
+            }
+
+            System.out.println("Total articles retrieved: " + Article.articleList.size()); // Log total number of articles
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle any SQL exceptions
+        }
+    }
+
+    public List<Article> getRecommendedArticles() {
+
+    }
 
 }

@@ -18,6 +18,9 @@ public class Article {
 
     private List<ArticleRecord> articleHistory = new ArrayList<>();
 
+    // Static list to store all articles
+    public static List<Article> articleList = new ArrayList<>(); // Static list for holding all articles
+
     public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish, String linkToArticle) {
         this.articleId = articleId;
         this.categoryId = categoryId;

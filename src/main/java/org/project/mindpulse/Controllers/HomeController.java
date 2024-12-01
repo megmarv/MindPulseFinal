@@ -110,8 +110,28 @@ public class HomeController extends ArticleHandler{
 
     @FXML
     public void filterRecommendedArticles() {
-        // placeholder for later implementation
+        // Clear the current articles list
+        currentArticles.clear();
+
+        // Fetch recommended articles. This can be dynamically based on user data or other logic.
+        List<Article> recommendedList = getRecommendedArticles();
+
+        // Add the recommended articles to the currentArticles list
+        currentArticles.addAll(recommendedList);
+
+        // Check if any recommended articles exist
+        if (currentArticles.isEmpty()) {
+            contentHeader.setText("No recommended articles found.");
+            webview.getEngine().loadContent("<html><body><p>No content available</p></body></html>");
+        } else {
+            // Display the first recommended article and set the content header
+            contentHeader.setText("Recommended Articles");
+            displayArticle(currentArticles.get(currentArticleIndex)); // Display first article
+        }
+
+        currentArticleIndex = 0; // Reset to the first article
     }
+
 
     @FXML
     private void displayArticle(Article article) {
@@ -131,8 +151,7 @@ public class HomeController extends ArticleHandler{
 
         java.net.URL cssUrl = getClass().getResource("/org/project/mindpulse/articleStyles.css");
 
-        // HTML content with CSS link
-        // Corrected HTML content with CSS link
+        // HTML content linking to the external stylesheet
         String articleContent = "<html><head>" +
                 "<link rel='stylesheet' type='text/css' href='" + cssUrl.toExternalForm() + "' />" +
                 "</head><body>" +
@@ -140,8 +159,7 @@ public class HomeController extends ArticleHandler{
                 "<p><strong>Author :</strong> " + article.getAuthorName() + "</p>" +
                 "<p><strong>Published on :</strong> " + article.getDateOfPublish() + "</p>" +
                 "<p class='content'>" + article.getContent() + "</p>" +
-                "<p>View the full article here: " +
-                "<a href='" + article.getLinkToArticle() + "' target='_blank'>" + article.getLinkToArticle() + "</a></p>" +
+                "<a href='" + article.getLinkToArticle() + "' target='_blank' class='article-button'>View the Full Article Here</a>" +
                 "</body></html>";
 
         // Load content into WebView

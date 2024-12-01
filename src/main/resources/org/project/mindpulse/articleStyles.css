@@ -9,3 +9,20 @@ h1{
 .content{
     font-family: Garamond;
 }
+
+/* styles.css */
+.article-button {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #007BFF;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    margin-top: 20px;
+}
+
+.article-button:hover {
+    background-color: #0056b3;
+}
