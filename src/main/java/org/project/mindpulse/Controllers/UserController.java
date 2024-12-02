@@ -155,6 +155,9 @@ public class UserController extends UserHandler implements GeneralFeatures{
         Scene scene = new Scene(mainMenuWindow, 1100, 600);
         stage.setScene(scene);
         stage.show();
+
+        UserController.populateUserHistory(loggedInUser);
+
     }
 
     @FXML
@@ -166,8 +169,6 @@ public class UserController extends UserHandler implements GeneralFeatures{
         Scene scene = new Scene(MainMenuWindow, 600, 400);
         stage.setScene(scene);
         stage.show();
-
-        UserController.populateUserHistory(loggedInUser);
     }
 
     @FXML

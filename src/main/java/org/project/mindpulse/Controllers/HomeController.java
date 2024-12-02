@@ -35,6 +35,9 @@ public class HomeController extends ArticleHandler{
     private List<Article> currentArticles = new ArrayList<>();
     private int currentArticleIndex = 0; // To track the current article
 
+    private long startTime; // To track the start time for article interactions
+
+
     @FXML
     public void initialize() {
     }
@@ -59,6 +62,7 @@ public class HomeController extends ArticleHandler{
             // Record interaction for the current article
             Article currentArticle = currentArticles.get(currentArticleIndex);
             recordInteraction(currentArticle);
+
 
             // Move to the next article in the filtered list
             currentArticleIndex = (currentArticleIndex + 1) % currentArticles.size();
@@ -111,31 +115,35 @@ public class HomeController extends ArticleHandler{
 
     @FXML
     public void filterRecommendedArticles() {
-        // Clear the current articles list
         currentArticles.clear();
+        User loggedInUser = UserController.getLoggedInUser();
 
-        // Fetch recommended articles. This can be dynamically based on user data or other logic.
-        List<Article> recommendedList = RecommendationEngine.recommendArticles(UserController.getLoggedInUser());
+        if (loggedInUser == null) {
+            System.out.println("No user logged in.");
+            return;
+        }
 
-        // Add the recommended articles to the currentArticles list
+        List<Article> recommendedList = RecommendationEngine.recommendArticles(loggedInUser);
         currentArticles.addAll(recommendedList);
 
-        // Check if any recommended articles exist
         if (currentArticles.isEmpty()) {
             contentHeader.setText("No recommended articles found.");
             webview.getEngine().loadContent("<html><body><p>No content available</p></body></html>");
         } else {
-            // Display the first recommended article and set the content header
             contentHeader.setText("Recommended Articles");
-            displayArticle(currentArticles.get(currentArticleIndex)); // Display first article
+            displayArticle(currentArticles.get(0));
         }
 
         currentArticleIndex = 0; // Reset to the first article
     }
 
 
+
     @FXML
     private void displayArticle(Article article) {
+
+        this.startTime = System.currentTimeMillis(); // Set the start time when displaying the article
+
 
         // Resolve the category name directly from the article
         String category = "Unknown Category"; // Default value
@@ -171,29 +179,18 @@ public class HomeController extends ArticleHandler{
     }
 
     private void recordInteraction(Article article) {
-        // Determine the interaction type (default to 'none')
-        boolean liked = false;
-        boolean disliked = false;
-
-        if (thumbsUp.isDisabled() && !thumbsDown.isDisabled()) {
-            liked = true;
-        } else if (thumbsDown.isDisabled() && !thumbsUp.isDisabled()) {
-            disliked = true;
-        }
+        long timeTakenMillis = System.currentTimeMillis() - this.startTime; // Calculate time taken for interaction
+        boolean liked = !thumbsUp.isDisable() && thumbsDown.isDisable();
+        boolean disliked = !thumbsDown.isDisable() && thumbsUp.isDisable();
 
         User loggedInUser = UserController.getLoggedInUser();
-        // Get the logged-in user
         if (loggedInUser == null) {
             System.out.println("No user logged in. Interaction not recorded.");
-            return; // Exit if no user is logged in
+            return;
         }
 
-        // Capture the time taken in milliseconds
-        long timeTakenMillis = System.currentTimeMillis() % 100000; // Example duration
-
-        // Prepare the interaction object
         ArticleRecord interaction = new ArticleRecord(
-                0, // Interaction ID (auto-generated in DB)
+                0, // Auto-generated in DB
                 article.getArticleId(),
                 article.getCategoryId(),
                 loggedInUser.getUserId(),
@@ -202,11 +199,15 @@ public class HomeController extends ArticleHandler{
                 timeTakenMillis
         );
 
-        // Log interaction details for debugging
-        System.out.println("Recording interaction: " + interaction);
+        saveInteractionToDatabase(interaction); // Save to DB
+        loggedInUser.updatePreference(
+                article.getCategoryId(),
+                liked ? 1 : 0,
+                disliked ? 1 : 0,
+                (!liked && !disliked) ? 1 : 0,
+                timeTakenMillis / 1000.0
+        );
 
-        // Save the interaction to the database
-        saveInteractionToDatabase(interaction);
     }
 
 

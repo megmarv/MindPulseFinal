@@ -19,6 +19,8 @@ public class User {
     public void addArticleRecord(ArticleRecord articleRecord) {
         userHistory.add(articleRecord);
         // considering articleRecord.setUser(this) but would make it a composition
+        // Optionally log for debugging
+        System.out.println("Added to history: " + articleRecord.toString());
     }
 
     // Add a new preference
@@ -36,18 +38,20 @@ public class User {
     }
 
     // Update an existing preference
-    public void updatePreference(int categoryId, int likes, int dislikes, int nullInteractions,double timeSpent) {
+    public void updatePreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent) {
         for (UserPreferences pref : preferredCategories) {
             if (pref.getCategoryId() == categoryId) {
-                pref.setLikes(likes);
-                pref.setDislikes(dislikes);
-                pref.setNullInteractions(nullInteractions);
-                pref.setTimeSpent(timeSpent);
+                pref.setLikes(pref.getLikes() + likes);
+                pref.setDislikes(pref.getDislikes() + dislikes);
+                pref.setNullInteractions(pref.getNullInteractions() + nullInteractions);
+                pref.setTimeSpent(pref.getTimeSpent() + timeSpent);
                 return;
             }
         }
-        System.out.println("Category " + categoryId + " does not exist. Use addPreference instead.");
+        // Add a new preference if it doesn't exist
+        addPreference(categoryId, likes, dislikes, nullInteractions, timeSpent);
     }
+
 
     // Get a specific preference
     public UserPreferences getPreference(int categoryId) {

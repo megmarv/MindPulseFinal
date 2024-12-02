@@ -15,12 +15,6 @@ public class RecommendationEngine {
     // variable to store the category with the highest score in the user preferences
     public static int categoryToRecommend;
 
-    // populate the user history article Record objects to populate user preferences
-    // populate a separate list of Article objects from the user history to make comparisons for the recommendations
-    // update the user preferences list consistently after every interaction
-    // compare all articles for the particular category in the database with articles of the topmost preference
-    // category for the user consistently using cosine similarity
-
     private static final int FEATURE_DIMENSION = 2; // Article content and category
 
     // method to convert article content to numbers using TF-IDF for the vector
@@ -51,7 +45,7 @@ public class RecommendationEngine {
 
     public static List<Article> recommendArticles(User user) {
 
-        assumePreferences(user);
+        assumePreferences(UserController.getLoggedInUser());
 
         List<Article> recommendedArticles = new ArrayList<>();
         List<Article> userHistory = UserHandler.getUserArticlesForRecommendation(user);
@@ -89,39 +83,41 @@ public class RecommendationEngine {
 
 
     public static void assumePreferences(User user) {
-
         UserHandler.populateUserHistory(user);
         UserHandler.populateUserPreferences(user);
 
         double time_weight = 0.4;
-        double like_weight = 0.5;
-        double dislike_weight = -0.3;
-        double null_weight = 0.1;
+        double like_weight = 0.7; // Prioritize likes
+        double dislike_weight = -0.5; // Penalize dislikes
+        double null_weight = 0.1; // Neutral weight for null interactions
 
-        for(UserPreferences preference : user.getAllPreferences()){
+        for (UserPreferences preference : user.getAllPreferences()) {
             preference.setTotalScore(
-                 preference.getLikes() * like_weight +
-                 preference.getDislikes() * dislike_weight +
-                 preference.getNullInteractions() * null_weight +
-                 preference.getTimeSpent() * time_weight
+                    preference.getLikes() * like_weight +
+                            preference.getDislikes() * dislike_weight +
+                            preference.getNullInteractions() * null_weight +
+                            preference.getTimeSpent() * time_weight
             );
+            System.out.println("Category: " + preference.getCategoryId() + ", Total Score: " + preference.getTotalScore());
         }
 
-        // sort the user preferences list in descending order of the total score
-        sortPreferencesByTotalScore(user.getAllPreferences());
+        // Ensure preferences are sorted correctly
+        user.getAllPreferences().sort((p1, p2) -> Double.compare(p2.getTotalScore(), p1.getTotalScore()));
 
-        categoryToRecommend = user.getAllPreferences().get(0).getCategoryId();
-
-
-
+        if (!user.getAllPreferences().isEmpty()) {
+            categoryToRecommend = user.getAllPreferences().get(0).getCategoryId();
+            System.out.println("Category to Recommend: " + categoryToRecommend);
+        } else {
+            System.out.println("No preferences available for recommendation.");
+        }
     }
+
 
     // Method to sort the list by totalScore using Stream API
     public static void sortPreferencesByTotalScore(List<UserPreferences> preferredCategories) {
-        preferredCategories = preferredCategories.stream()
-                .sorted((p1, p2) -> Double.compare(p2.getTotalScore(), p1.getTotalScore()))  // Descending order
-                .collect(Collectors.toList());
+        preferredCategories.sort((p1, p2) -> Double.compare(p2.getTotalScore(), p1.getTotalScore())); // Sort in descending order
     }
+
 
 
 }

@@ -123,35 +123,16 @@ public class UserHandler {
             statement.setInt(1, user.getUserId());
             ResultSet resultSet = statement.executeQuery();
 
-            boolean liked;
-            boolean disliked;
-
             while (resultSet.next()) {
                 int interactionId = resultSet.getInt("interactionId");
                 int articleId = resultSet.getInt("articleId");
                 int categoryId = resultSet.getInt("categoryId");
-                int userId = resultSet.getInt("userId");
-                String rating = resultSet.getString("rating");
+                boolean liked = resultSet.getString("rating").equalsIgnoreCase("like");
+                boolean disliked = resultSet.getString("rating").equalsIgnoreCase("dislike");
+                String timeTaken = resultSet.getString("timeTaken");
 
-                // Initialize booleans based on rating
-                liked = false;
-                disliked = false;
-
-                if (rating.equals("liked")) {
-                    liked = true;
-                } else if (rating.equals("disliked")) {
-                    disliked = true;
-                }
-
-                String timeTakenString = resultSet.getString("timeTaken");
-                // Parse timeTaken from HH:mm:ss to milliseconds
-                long timeTaken = parseTimeTakenToMillis(timeTakenString);
-
-                // Create ArticleRecord object
-                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId, liked, disliked, timeTaken);
-
-                // Use the addArticleRecord method to associate the record with the user
-                user.addArticleRecord(record);  // This method will add the record to the user's history
+                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, user.getUserId(), liked, disliked, timeTaken);
+                user.addArticleRecord(record);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -197,13 +178,13 @@ public class UserHandler {
 
     // Method to populate all user preferences
     public static void populateUserPreferences(User user) {
-        String query = """
+            String query = """
         SELECT 
             categoryid,
             COUNT(CASE WHEN rating = 'like' THEN 1 END) AS likes,
             COUNT(CASE WHEN rating = 'dislike' THEN 1 END) AS dislikes,
             COUNT(CASE WHEN rating = 'none' THEN 1 END) AS nullratings,
-            COUNT(timetaken) AS timetaken
+            SUM(EXTRACT(EPOCH FROM timetaken)) AS totalTimeSpent
         FROM ArticleInteractions
         WHERE userid = ?
         GROUP BY categoryid;
@@ -212,26 +193,26 @@ public class UserHandler {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            // Use the userId directly from the User object
             statement.setInt(1, user.getUserId());
             ResultSet resultSet = statement.executeQuery();
 
-            // Directly updating the provided User object
             while (resultSet.next()) {
                 int categoryId = resultSet.getInt("categoryid");
                 int likes = resultSet.getInt("likes");
                 int dislikes = resultSet.getInt("dislikes");
                 int nullRatings = resultSet.getInt("nullratings");
-                double timeSpent = resultSet.getDouble("timetaken");
+                double timeSpent = resultSet.getDouble("totalTimeSpent");
 
-                // Add the preference to the provided User object
-                user.addPreference(categoryId, likes, dislikes, nullRatings, timeSpent);
+                user.updatePreference(categoryId, likes, dislikes, nullRatings, timeSpent);
+                System.out.println("Updated Preferences: " + user.getAllPreferences());
+                System.out.println("Category ID: " + categoryId + ", Time Spent: " + timeSpent + " seconds");
+
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
 
     // Helper method to parse HH:mm:ss to milliseconds

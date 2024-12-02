@@ -10,8 +10,6 @@ public class ArticleRecord {
     private boolean disliked;
     private long timeTakenMillis;
 
-
-    // Constructor with rating as a boolean
     public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, boolean liked, boolean disliked, long timeTakenMillis) {
         this.interactionId = interactionId;
         this.articleID = articleID;
@@ -22,9 +20,24 @@ public class ArticleRecord {
         this.timeTakenMillis = timeTakenMillis;
     }
 
-    // Constructor without a rating (defaults to 'none')
-    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, long timeTakenMillis) {
-        this(interactionId, articleID, categoryId, userId, false, false, timeTakenMillis);
+    public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, boolean liked, boolean disliked, String timeTakenInterval) {
+        this(interactionId, articleID, categoryId, userId, liked, disliked, parseIntervalToMillis(timeTakenInterval));
+    }
+
+    private static long parseIntervalToMillis(String interval) {
+        String[] parts = interval.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = Integer.parseInt(parts[2]);
+        return (hours * 3600 + minutes * 60 + seconds) * 1000L;
+    }
+
+    public long getTimeTakenMillis() {
+        return timeTakenMillis;
+    }
+
+    public void setTimeTakenMillis(long timeTakenMillis) {
+        this.timeTakenMillis = timeTakenMillis;
     }
 
     // Getters and setters for your fields
@@ -74,14 +87,6 @@ public class ArticleRecord {
 
     public void setDisliked(boolean disliked) {
         this.disliked = disliked;
-    }
-
-    public long getTimeTakenMillis() {
-        return timeTakenMillis;
-    }
-
-    public void setTimeTakenMillis(long timeTakenMillis) {
-        this.timeTakenMillis = timeTakenMillis;
     }
 
     public String getTimeTakenAsInterval() {
