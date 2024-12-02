@@ -100,30 +100,6 @@ public class ArticleHandler {
         return null;
     }
 
-
-    public boolean hasUserInteracted(int userId, int articleId) {
-        String query = "SELECT COUNT(*) FROM ARTICLEINTERACTIONS WHERE userid = ? AND articleid = ?";
-
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setInt(1, userId);
-            statement.setInt(2, articleId);
-
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // If the count is greater than 0, the user has already interacted with the article
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error checking user interaction: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return false; // User has not interacted with the article
-    }
-
     // Refactor of retrieveAllArticles() method to correctly handle the ResultSet and add articles to static list
     public static void retrieveAllArticles() {
         System.out.println("Retrieving all articles from the database...");
@@ -159,10 +135,6 @@ public class ArticleHandler {
         } catch (SQLException e) {
             e.printStackTrace(); // Handle any SQL exceptions
         }
-    }
-
-    public List<Article> getRecommendedArticles() {
-        return null;
     }
 
 }

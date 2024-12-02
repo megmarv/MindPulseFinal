@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.web.WebView;
 import org.project.mindpulse.CoreModules.*;
 import org.project.mindpulse.Database.ArticleHandler;
+import org.project.mindpulse.Service.RecommendationEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +115,7 @@ public class HomeController extends ArticleHandler{
         currentArticles.clear();
 
         // Fetch recommended articles. This can be dynamically based on user data or other logic.
-        List<Article> recommendedList = getRecommendedArticles();
+        List<Article> recommendedList = RecommendationEngine.recommendArticles(UserController.getLoggedInUser());
 
         // Add the recommended articles to the currentArticles list
         currentArticles.addAll(recommendedList);

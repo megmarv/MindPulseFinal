@@ -143,7 +143,9 @@ public class UserHandler {
                     disliked = true;
                 }
 
-                long timeTaken = resultSet.getLong("timeTaken");
+                String timeTakenString = resultSet.getString("timeTaken");
+                // Parse timeTaken from HH:mm:ss to milliseconds
+                long timeTaken = parseTimeTakenToMillis(timeTakenString);
 
                 // Create ArticleRecord object
                 ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId, liked, disliked, timeTaken);
@@ -190,6 +192,62 @@ public class UserHandler {
         }
 
         return userArticles;
+    }
+
+
+    // Method to populate all user preferences
+    public static void populateUserPreferences(User user) {
+        String query = """
+        SELECT 
+            categoryid,
+            COUNT(CASE WHEN rating = 'like' THEN 1 END) AS likes,
+            COUNT(CASE WHEN rating = 'dislike' THEN 1 END) AS dislikes,
+            COUNT(CASE WHEN rating = 'none' THEN 1 END) AS nullratings,
+            COUNT(timetaken) AS timetaken
+        FROM ArticleInteractions
+        WHERE userid = ?
+        GROUP BY categoryid;
+    """;
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            // Use the userId directly from the User object
+            statement.setInt(1, user.getUserId());
+            ResultSet resultSet = statement.executeQuery();
+
+            // Directly updating the provided User object
+            while (resultSet.next()) {
+                int categoryId = resultSet.getInt("categoryid");
+                int likes = resultSet.getInt("likes");
+                int dislikes = resultSet.getInt("dislikes");
+                int nullRatings = resultSet.getInt("nullratings");
+                double timeSpent = resultSet.getDouble("timetaken");
+
+                // Add the preference to the provided User object
+                user.addPreference(categoryId, likes, dislikes, nullRatings, timeSpent);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // Helper method to parse HH:mm:ss to milliseconds
+    private static long parseTimeTakenToMillis(String timeTaken) {
+        try {
+            String[] parts = timeTaken.split(":");
+            int hours = Integer.parseInt(parts[0]);
+            int minutes = Integer.parseInt(parts[1]);
+            int seconds = Integer.parseInt(parts[2]);
+
+            return (hours * 3600 + minutes * 60 + seconds) * 1000L;
+        } catch (Exception e) {
+            System.err.println("Error parsing timeTaken: " + timeTaken);
+            e.printStackTrace();
+            return 0L; // Default to 0 if parsing fails
+        }
     }
 
 

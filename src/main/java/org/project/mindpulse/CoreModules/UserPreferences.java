@@ -8,13 +8,32 @@ public class UserPreferences {
     private int dislikes;
     private int nullInteractions;
     private double timeSpent;
+    private double totalScore;
 
-    public UserPreferences(int categoryId, int likes, int dislikes, int nullInteractions,double timeSpent) {
+    public UserPreferences(int categoryId, int likes, int dislikes, int nullInteractions,double timeSpent, double totalScore) {
         this.categoryId = categoryId;
         this.likes = likes;
         this.dislikes = dislikes;
         this.nullInteractions = nullInteractions;
         this.timeSpent = timeSpent;
+        this.totalScore = totalScore;
+    }
+
+    public UserPreferences(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent) {
+        this.categoryId = categoryId;
+        this.likes = likes;
+        this.dislikes = dislikes;
+        this.nullInteractions = nullInteractions;
+        this.timeSpent = timeSpent;
+        this.totalScore = 0;
+    }
+
+    public double getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(double totalScore) {
+        this.totalScore = totalScore;
     }
 
     public double getTimeSpent() {

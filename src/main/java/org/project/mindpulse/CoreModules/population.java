@@ -12,43 +12,6 @@ public class population{
 
 
 
-    // Method to populate all user preferences
-    public void populateUserPreferences(User user) {
-        String query = """
-    SELECT 
-        categoryid,
-        COUNT(CASE WHEN rating = 'like' THEN 1 END) AS likes,
-        COUNT(CASE WHEN rating = 'dislike' THEN 1 END) AS dislikes,
-        COUNT(CASE WHEN rating = 'none' THEN 1 END) AS nullratings
-    FROM ArticleInteractions
-    WHERE userid = ?
-    GROUP BY categoryid;
-    """;
-
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            // Use the userId directly from the User object
-            statement.setInt(1, user.getUserId());
-            ResultSet resultSet = statement.executeQuery();
-
-            // Directly updating the provided User object
-            while (resultSet.next()) {
-                int categoryId = resultSet.getInt("categoryid");
-                int likes = resultSet.getInt("likes");
-                int dislikes = resultSet.getInt("dislikes");
-                int nullRatings = resultSet.getInt("nullratings");
-
-                // Add the preference to the provided User object
-                user.addPreference(categoryId, likes, dislikes, nullRatings);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     // Method to populate article history
     public void populateArticleHistory(Article article) {
         String query = "SELECT * FROM ArticleRecords WHERE articleId = ?";
