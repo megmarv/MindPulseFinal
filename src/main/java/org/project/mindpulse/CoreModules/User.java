@@ -22,7 +22,7 @@ public class User {
     }
 
     // Add a new preference
-    public void addPreference(int categoryId, int likes, int dislikes, int nullInteractions) {
+    public void addPreference(int categoryId, int likes, int dislikes, int nullInteractions,double timeSpent) {
         // Check if the category already exists
         for (UserPreferences pref : preferredCategories) {
             if (pref.getCategoryId() == categoryId) {
@@ -31,17 +31,18 @@ public class User {
             }
         }
         // Add new preference
-        UserPreferences newPreference = new UserPreferences(categoryId, likes, dislikes, nullInteractions);
+        UserPreferences newPreference = new UserPreferences(categoryId, likes, dislikes, nullInteractions,timeSpent);
         preferredCategories.add(newPreference);
     }
 
     // Update an existing preference
-    public void updatePreference(int categoryId, int likes, int dislikes, int nullInteractions) {
+    public void updatePreference(int categoryId, int likes, int dislikes, int nullInteractions,double timeSpent) {
         for (UserPreferences pref : preferredCategories) {
             if (pref.getCategoryId() == categoryId) {
                 pref.setLikes(likes);
                 pref.setDislikes(dislikes);
                 pref.setNullInteractions(nullInteractions);
+                pref.setTimeSpent(timeSpent);
                 return;
             }
         }
@@ -142,5 +143,14 @@ public class User {
 
     public void setUserHistory(List<ArticleRecord> userHistory) {
         this.userHistory = userHistory;
+    }
+
+    public boolean hasInteractedWithArticle(int articleId){
+        for(ArticleRecord articleRecord : userHistory){
+            if(articleRecord.getArticleID() == articleId){
+                return true;
+            }
+        }
+        return false;
     }
 }

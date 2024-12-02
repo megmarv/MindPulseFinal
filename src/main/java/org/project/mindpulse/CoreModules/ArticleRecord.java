@@ -10,6 +10,7 @@ public class ArticleRecord {
     private boolean disliked;
     private long timeTakenMillis;
 
+
     // Constructor with rating as a boolean
     public ArticleRecord(int interactionId, int articleID, int categoryId, int userId, boolean liked, boolean disliked, long timeTakenMillis) {
         this.interactionId = interactionId;

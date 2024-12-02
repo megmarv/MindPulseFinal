@@ -7,12 +7,22 @@ public class UserPreferences {
     private int likes;
     private int dislikes;
     private int nullInteractions;
+    private double timeSpent;
 
-    public UserPreferences(int categoryId, int likes, int dislikes, int nullInteractions) {
+    public UserPreferences(int categoryId, int likes, int dislikes, int nullInteractions,double timeSpent) {
         this.categoryId = categoryId;
         this.likes = likes;
         this.dislikes = dislikes;
         this.nullInteractions = nullInteractions;
+        this.timeSpent = timeSpent;
+    }
+
+    public double getTimeSpent() {
+        return timeSpent;
+    }
+
+    public void setTimeSpent(double timeSpent) {
+        this.timeSpent = timeSpent;
     }
 
     public int getCategoryId() {

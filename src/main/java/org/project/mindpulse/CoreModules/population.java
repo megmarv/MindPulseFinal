@@ -10,47 +10,7 @@ public class population{
     private static final String USER = "postgres";
     private static final String PASSWORD = "aaqib2004";
 
-    // Method to populate user history
-    public void populateUserHistory(User user) {
-        String query = "SELECT * FROM ArticleInteractions WHERE userId = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setInt(1, user.getUserId());
-            ResultSet resultSet = statement.executeQuery();
-
-            boolean liked;
-            boolean disliked;
-
-            while (resultSet.next()) {
-                int interactionId = resultSet.getInt("interactionId");
-                int articleId = resultSet.getInt("articleId");
-                int categoryId = resultSet.getInt("categoryId");
-                int userId = resultSet.getInt("userId");
-                String rating = resultSet.getString("rating");
-
-                // Initialize booleans based on rating
-                liked = false;
-                disliked = false;
-
-                if (rating.equals("liked")) {
-                    liked = true;
-                } else if (rating.equals("disliked")) {
-                    disliked = true;
-                }
-
-                long timeTaken = resultSet.getLong("timeTaken");
-
-                // Create ArticleRecord object
-                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId, liked, disliked, timeTaken);
-
-                // Use the addArticleRecord method to associate the record with the user
-                user.addArticleRecord(record);  // This method will add the record to the user's history
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     // Method to populate all user preferences
     public void populateUserPreferences(User user) {

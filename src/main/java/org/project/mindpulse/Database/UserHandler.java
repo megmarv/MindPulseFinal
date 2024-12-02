@@ -1,8 +1,12 @@
 package org.project.mindpulse.Database;
 
+import org.project.mindpulse.CoreModules.Article;
+import org.project.mindpulse.CoreModules.ArticleRecord;
 import org.project.mindpulse.CoreModules.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserHandler {
 
@@ -109,5 +113,84 @@ public class UserHandler {
 
         return user;
     }
+
+    // Method to populate user history
+    public static void populateUserHistory(User user) {
+        String query = "SELECT * FROM ArticleInteractions WHERE userId = ?";
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, user.getUserId());
+            ResultSet resultSet = statement.executeQuery();
+
+            boolean liked;
+            boolean disliked;
+
+            while (resultSet.next()) {
+                int interactionId = resultSet.getInt("interactionId");
+                int articleId = resultSet.getInt("articleId");
+                int categoryId = resultSet.getInt("categoryId");
+                int userId = resultSet.getInt("userId");
+                String rating = resultSet.getString("rating");
+
+                // Initialize booleans based on rating
+                liked = false;
+                disliked = false;
+
+                if (rating.equals("liked")) {
+                    liked = true;
+                } else if (rating.equals("disliked")) {
+                    disliked = true;
+                }
+
+                long timeTaken = resultSet.getLong("timeTaken");
+
+                // Create ArticleRecord object
+                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, userId, liked, disliked, timeTaken);
+
+                // Use the addArticleRecord method to associate the record with the user
+                user.addArticleRecord(record);  // This method will add the record to the user's history
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to return a list of Article objects for the Recommendation Engine
+    public static List<Article> getUserArticlesForRecommendation(User user) {
+        List<Article> userArticles = new ArrayList<>();
+        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish, a.linkToArticle " +
+                "FROM ArticleInteractions ai " +
+                "JOIN Articles a ON ai.articleId = a.articleId " +
+                "WHERE ai.userId = ?";
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, user.getUserId());
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int articleId = resultSet.getInt("articleId");
+                int categoryId = resultSet.getInt("categoryId");
+                String title = resultSet.getString("title");
+                String authorName = resultSet.getString("authorName");
+                String content = resultSet.getString("content");
+                Date dateOfPublish = resultSet.getDate("dateOfPublish");
+                String linkToArticle = resultSet.getString("linkToArticle");
+
+                // Create an Article object with the retrieved data
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish, linkToArticle);
+
+                // Add the Article object to the list
+                userArticles.add(article);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userArticles;
+    }
+
 
 }

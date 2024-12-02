@@ -165,6 +165,8 @@ public class HomeController extends ArticleHandler{
         // Load content into WebView
         webview.getEngine().loadContent(articleContent);
 
+        // implement redirect to website source on desktop browser
+
     }
 
     private void recordInteraction(Article article) {

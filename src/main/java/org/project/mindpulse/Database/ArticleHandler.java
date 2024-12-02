@@ -11,7 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArticleHandler{
+public class ArticleHandler {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/MindPulse";
     private static final String USER = "postgres";
@@ -79,7 +79,7 @@ public class ArticleHandler{
                 String link = resultSet.getString("linkToArticle");
 
                 // Create an Article object
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish,link);
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish, link);
 
                 // Add the article to the category's list
                 category.addArticle(article);
@@ -148,7 +148,7 @@ public class ArticleHandler{
                 String link = rs.getString("linkToArticle");
 
                 // Create a new Article object and add it to the static list
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish,link);
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish, link);
                 Article.articleList.add(article); // Add the article to the static list
 
                 System.out.println("Added Article: " + article); // Log each added article
@@ -162,7 +162,8 @@ public class ArticleHandler{
     }
 
     public List<Article> getRecommendedArticles() {
-
+        return null;
     }
 
 }
+
