@@ -172,7 +172,6 @@ public class HomeController extends ArticleHandler{
                 "<p><strong>Author :</strong> " + article.getAuthorName() + "</p>" +
                 "<p><strong>Published on :</strong> " + article.getDateOfPublish() + "</p>" +
                 "<p class='content'>" + article.getContent() + "</p>" +
-                "<a href='" + article.getLinkToArticle() + "' target='_blank' class='article-button'>View the Full Article Here</a>" +
                 "</body></html>";
 
         webview.getEngine().loadContent(articleContent);

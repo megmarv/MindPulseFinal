@@ -3,7 +3,8 @@ body{
 }
 
 h1{
-    font-family: "Copperplate Gothic Bold"
+    font-family: "Copperplate Gothic Bold";
+    font-size:18px;
 }
 
 .content{

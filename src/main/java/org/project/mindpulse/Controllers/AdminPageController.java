@@ -17,8 +17,12 @@ import org.project.mindpulse.CoreModules.Category;
 import org.project.mindpulse.CoreModules.User;
 import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Database.UserHandler;
+import org.project.mindpulse.Service.ArticleFetcher;
+import org.project.mindpulse.Service.ArticleSorter;
+import org.project.mindpulse.Service.currentsApiResponse;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +50,10 @@ public class AdminPageController implements GeneralFeatures {
     @FXML private Button logOut;
 
     @FXML private Button deleteButton;
+
+    @FXML private Button goTofetchArticles;
+
+    @FXML private Button fetchArticles;
 
 
     @FXML
@@ -172,5 +180,44 @@ public class AdminPageController implements GeneralFeatures {
         }
     }
 
+    @FXML
+    public void fetchAndSaveArticles(ActionEvent event) {
+        try {
+            ArticleFetcher fetcher = new ArticleFetcher();
+            ArticleSorter sorter = new ArticleSorter();
+            ArticleHandler handler = new ArticleHandler();
+
+            List<currentsApiResponse.ArticleResponse> fetchedArticles = fetcher.fetchArticles();
+            List<Article> categorizedArticles = new ArrayList<>();
+
+            for (currentsApiResponse.ArticleResponse response : fetchedArticles) {
+                String category = sorter.assignCategory(response.getTitle(), response.getDescription());
+                int categoryId = handler.getCategoryIdByName(category); // Fetch category ID from DB or predefined list
+
+                Article article = new Article(0, categoryId, response.getTitle(), response.getAuthor(),
+                        response.getDescription(), Date.valueOf(response.getPublished()));
+
+
+                categorizedArticles.add(article);
+            }
+
+            handler.saveArticlesToDatabase(categorizedArticles);
+            displayConfirmation("Articles fetched and saved successfully!");
+        } catch (Exception e) {
+            displayError("Error fetching or saving articles: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void redirectToFetchingArticles(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/ArticleFetching.fxml"));
+        Parent mainMenuWindow = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle("Admin Portal");
+        Scene scene = new Scene(mainMenuWindow, 1100, 600);
+        stage.setScene(scene);
+        stage.show();
+
+    }
 
 }

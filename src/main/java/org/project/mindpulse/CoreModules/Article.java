@@ -12,7 +12,6 @@ public class Article {
     private String authorName;
     private String content;
     private Date dateOfPublish;
-    private String linkToArticle;
 
     private Category category; // aggregation pointer
 
@@ -21,14 +20,13 @@ public class Article {
     // Static list to store all articles
     public static List<Article> articleList = new ArrayList<>(); // Static list for holding all articles
 
-    public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish, String linkToArticle) {
+    public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish) {
         this.articleId = articleId;
         this.categoryId = categoryId;
         this.title = title;
         this.authorName = authorName;
         this.content = content;
         this.dateOfPublish = dateOfPublish;
-        this.linkToArticle = linkToArticle;
         this.articleHistory = new ArrayList<>();
     }
 
@@ -47,14 +45,6 @@ public class Article {
 
     public List<ArticleRecord> getArticleHistory() {
         return articleHistory;
-    }
-
-    public String getLinkToArticle() {
-        return linkToArticle;
-    }
-
-    public void setLinkToArticle(String linkToArticle) {
-        this.linkToArticle = linkToArticle;
     }
 
     public int getArticleId() {

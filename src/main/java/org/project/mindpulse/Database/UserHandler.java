@@ -143,7 +143,7 @@ public class UserHandler {
     // Method to return a list of Article objects for the Recommendation Engine
     public static List<Article> getUserArticlesForRecommendation(User user) {
         List<Article> userArticles = new ArrayList<>();
-        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish, a.linkToArticle " +
+        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish" +
                 "FROM ArticleInteractions ai " +
                 "JOIN Articles a ON ai.articleId = a.articleId " +
                 "WHERE ai.userId = ?";
@@ -161,10 +161,9 @@ public class UserHandler {
                 String authorName = resultSet.getString("authorName");
                 String content = resultSet.getString("content");
                 Date dateOfPublish = resultSet.getDate("dateOfPublish");
-                String linkToArticle = resultSet.getString("linkToArticle");
 
                 // Create an Article object with the retrieved data
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish, linkToArticle);
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
 
                 // Add the Article object to the list
                 userArticles.add(article);

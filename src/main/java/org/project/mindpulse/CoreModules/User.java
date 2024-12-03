@@ -18,7 +18,6 @@ public class User {
 
     public void addArticleRecord(ArticleRecord articleRecord) {
         userHistory.add(articleRecord);
-        // considering articleRecord.setUser(this) but would make it a composition
         // Optionally log for debugging
         System.out.println("Added to history: " + articleRecord.toString());
     }

@@ -17,6 +17,23 @@ public class ArticleHandler {
     private static final String USER = "postgres";
     private static final String PASSWORD = "aaqib2004";
 
+    public static void insertArticle(Article article) {
+        String query = "INSERT INTO Articles (articleId, categoryId, title, authorName, dateOfPublish, content) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, article.getArticleId());
+            statement.setInt(2, article.getCategoryId());
+            statement.setString(3, article.getTitle());
+            statement.setString(4, article.getAuthorName());
+            statement.setDate(5, article.getDateOfPublish());
+            statement.setString(6, article.getContent());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getCategoryIdByName(String categoryName) {
         return switch (categoryName) {
             case "sports" -> 5;
@@ -76,10 +93,9 @@ public class ArticleHandler {
                 String authorName = resultSet.getString("authorName");
                 String content = resultSet.getString("content");
                 Date dateOfPublish = resultSet.getDate("dateOfPublish");
-                String link = resultSet.getString("linkToArticle");
 
                 // Create an Article object
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish, link);
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
 
                 // Add the article to the category's list
                 category.addArticle(article);
@@ -121,10 +137,9 @@ public class ArticleHandler {
                 String authorName = rs.getString("authorname");
                 String content = rs.getString("content");
                 Date dateOfPublish = rs.getDate("dateofpublish");
-                String link = rs.getString("linkToArticle");
 
                 // Create a new Article object and add it to the static list
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish, link);
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
                 Article.articleList.add(article); // Add the article to the static list
 
                 System.out.println("Added Article: " + article); // Log each added article
@@ -148,6 +163,27 @@ public class ArticleHandler {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void saveArticlesToDatabase(List<Article> articles) throws SQLException {
+        String insertQuery = "INSERT INTO articles (categoryid,title, authorname, dateofpublish, content) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = connection.prepareStatement(insertQuery)) {
+
+            for (Article article : articles) {
+
+                stmt.setInt(1, article.getCategoryId());
+                stmt.setString(2, article.getTitle());
+                stmt.setString(3, article.getAuthorName());
+                stmt.setDate(4, article.getDateOfPublish());
+                stmt.setString(5, article.getContent());
+
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
         }
     }
 
