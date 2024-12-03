@@ -57,26 +57,20 @@ public class HomeController extends ArticleHandler{
 
     @FXML
     public void nextArticle(ActionEvent event) {
-
         if (!currentArticles.isEmpty()) {
-            // Record interaction for the current article
             Article currentArticle = currentArticles.get(currentArticleIndex);
             recordInteraction(currentArticle);
 
+            filterRecommendedArticles(); // Refresh recommendations
 
-            // Refresh recommendations
-            filterRecommendedArticles();
-
-
-            // Move to the next article in the filtered list
             currentArticleIndex = (currentArticleIndex + 1) % currentArticles.size();
             displayArticle(currentArticles.get(currentArticleIndex));
 
-            interactionCount++;
-
+            System.out.println("Moved to next article. Current Index: " + currentArticleIndex);
+        } else {
+            System.out.println("No more articles to display.");
         }
 
-        // Reset thumbs buttons for the new article
         resetThumbsButtons();
     }
 
