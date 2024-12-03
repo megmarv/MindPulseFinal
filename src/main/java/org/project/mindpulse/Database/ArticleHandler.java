@@ -137,5 +137,20 @@ public class ArticleHandler {
         }
     }
 
+    public static void deleteArticle(int articleId) {
+        String query = "DELETE FROM articles WHERE articleid = ?";
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, articleId);
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Article deleted successfully.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
 

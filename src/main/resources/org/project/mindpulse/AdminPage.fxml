@@ -69,7 +69,7 @@
                                         <String fx:value="white-bg" />
                                         <String fx:value="shadow" />
                                     </styleClass>                                    <children>
-                                    <Button layoutX="380.0" layoutY="496.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="113.0" styleClass="rateArticle" text="Delete" />
+                                    <Button layoutX="380.0" layoutY="496.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="113.0" styleClass="rateArticle" text="Delete" fx:id="deleteButton" onAction="#handleDelete" />
                               <TableView fx:id="sharedTable" layoutX="14.0" layoutY="14.0" prefHeight="475.0" prefWidth="850.0">
                                 <columns>
                                   <TableColumn fx:id="column1" prefWidth="75.0" text="C1" />

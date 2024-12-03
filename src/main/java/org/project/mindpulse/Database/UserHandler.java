@@ -68,20 +68,20 @@ public class UserHandler {
         return false; // Return false if an error occurs
     }
 
-    // method to delete a user from the database
-    public boolean deleteUser(String username) {
-        String query = "DELETE FROM Users WHERE username = ?";
+    public static void deleteUser(int userId) {
+        String query = "DELETE FROM users WHERE userid = ?";
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, username);
-            int rowsDeleted = statement.executeUpdate();
-            return rowsDeleted > 0; // Return true if the user was successfully deleted
+            statement.setInt(1, userId);
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("User deleted successfully.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false; // Return false if an error occurs
     }
+
 
     public User getUserDetails(String username) {
         // SQL query to fetch user details based on the username

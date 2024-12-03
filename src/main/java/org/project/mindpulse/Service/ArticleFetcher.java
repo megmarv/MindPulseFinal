@@ -1,4 +1,6 @@
 package org.project.mindpulse.Service;
 
-public class ArticleCategorizor {
+public class ArticleFetcher {
+
+
 }

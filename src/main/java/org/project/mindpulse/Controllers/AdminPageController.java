@@ -45,6 +45,9 @@ public class AdminPageController implements GeneralFeatures {
 
     @FXML private Button logOut;
 
+    @FXML private Button deleteButton;
+
+
     @FXML
     public void initialize() {
 
@@ -143,5 +146,31 @@ public class AdminPageController implements GeneralFeatures {
         stage.show();
 
     }
+
+    @FXML
+    public void handleDelete(ActionEvent event) {
+        Object selectedItem = sharedTable.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete this item?", ButtonType.YES, ButtonType.NO);
+            confirmationAlert.setTitle("Confirm Delete");
+            confirmationAlert.showAndWait();
+
+            if (confirmationAlert.getResult() == ButtonType.YES) {
+                if (selectedItem instanceof User) {
+                    User selectedUser = (User) selectedItem;
+                    UserHandler.deleteUser(selectedUser.getUserId());
+                    users.remove(selectedUser);
+                } else if (selectedItem instanceof Article) {
+                    Article selectedArticle = (Article) selectedItem;
+                    ArticleHandler.deleteArticle(selectedArticle.getArticleId());
+                    articles.remove(selectedArticle);
+                }
+                displayConfirmation("Item deleted successfully!");
+            }
+        } else {
+            displayError("No item selected for deletion.");
+        }
+    }
+
 
 }
