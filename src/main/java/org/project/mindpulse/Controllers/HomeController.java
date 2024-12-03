@@ -64,6 +64,10 @@ public class HomeController extends ArticleHandler{
             recordInteraction(currentArticle);
 
 
+            // Refresh recommendations
+            filterRecommendedArticles();
+
+
             // Move to the next article in the filtered list
             currentArticleIndex = (currentArticleIndex + 1) % currentArticles.size();
             displayArticle(currentArticles.get(currentArticleIndex));
@@ -123,7 +127,9 @@ public class HomeController extends ArticleHandler{
             return;
         }
 
+        // Get recommended articles (already sorted)
         List<Article> recommendedList = RecommendationEngine.recommendArticles(loggedInUser);
+
         currentArticles.addAll(recommendedList);
 
         if (currentArticles.isEmpty()) {

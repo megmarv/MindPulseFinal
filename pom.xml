@@ -75,6 +75,13 @@
       <version>8.9</version> <!-- Check for the latest version -->
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <version>1.10.0</version> <!-- Latest version as of now -->
+    </dependency>
+
+
 
     <dependency>
       <groupId>com.google.code.gson</groupId>
