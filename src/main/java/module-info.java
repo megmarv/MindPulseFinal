@@ -8,8 +8,10 @@ module org.project.mindpulse {
     requires org.postgresql.jdbc;
     requires java.desktop;
     requires org.apache.commons.text;
+    requires javafx.controls;
 
     opens org.project.mindpulse.Controllers to javafx.fxml;
+    opens org.project.mindpulse.CoreModules to javafx.base;
 
     exports org.project.mindpulse.Application;
 }

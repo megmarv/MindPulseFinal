@@ -109,6 +109,15 @@ public class Article {
         return category;
     }
 
+    public String getCategoryNameById(int categoryId, List<Category> categories) {
+        for (Category category : categories) {
+            if (category.getCategoryID() == categoryId) {
+                return category.getCategoryName();
+            }
+        }
+        return "Unknown Category"; // Return a default value if not found
+    }
+
     public void setArticleHistory(List<ArticleRecord> articleHistory) {
         this.articleHistory = articleHistory;
     }

@@ -39,8 +39,8 @@
                         <Font size="14.0" />
                     </font>
                 </PasswordField>
-                <Button fx:id="LoginButton" layoutX="65.0" layoutY="251.0" mnemonicParsing="false" onAction="#login" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Log In" />
-                <Button fx:id="exit" layoutX="314.0" layoutY="1.0" mnemonicParsing="false" onAction="#Exit" prefHeight="26.0" prefWidth="36.0" styleClass="close" text="X" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
+                <Button fx:id="loginButton" layoutX="65.0" layoutY="251.0" mnemonicParsing="false" onAction="#login" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Log In" />
+                <Button fx:id="exitButton" layoutX="314.0" layoutY="1.0" mnemonicParsing="false" onAction="#Exit" prefHeight="26.0" prefWidth="36.0" styleClass="close" text="X" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
                     <font>
                         <Font name="System Bold" size="12.0" />
                     </font></Button>
@@ -49,6 +49,7 @@
                         <Font name="Tahoma Bold" size="17.0" />
                     </font>
                 </Label>
+            <Button fx:id="backToMain" layoutX="119.0" layoutY="346.0" mnemonicParsing="false" onAction="#backToMain" prefHeight="26.0" prefWidth="111.0" styleClass="login-btn" text="Back" />
             </children>
         </AnchorPane>
     </children>

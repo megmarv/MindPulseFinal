@@ -31,6 +31,7 @@ public class UserHandler {
         return false; // Return false if user does not exist or an error occurs
     }
 
+
     // method to check if the password is correct for a given username
     public boolean passwordCorrect(String username, String password) {
         String query = "SELECT password FROM Users WHERE username = ?";
@@ -230,6 +231,33 @@ public class UserHandler {
             return 0L; // Default to 0 if parsing fails
         }
     }
+
+    public static List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM Users";
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                int userID = rs.getInt("UserID");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String username = rs.getString("username");
+                String password = rs.getString("password");
+
+                users.add(new User(userID, name, email, username, password));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching users: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+
 
 
 }
