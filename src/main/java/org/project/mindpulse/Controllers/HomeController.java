@@ -55,14 +55,14 @@ public class HomeController extends ArticleHandler{
 
     public int interactionCount = 0;
 
+
     @FXML
     public void nextArticle(ActionEvent event) {
         if (!currentArticles.isEmpty()) {
             Article currentArticle = currentArticles.get(currentArticleIndex);
             recordInteraction(currentArticle);
 
-            filterRecommendedArticles(); // Refresh recommendations
-
+            // Move to the next article in the current list
             currentArticleIndex = (currentArticleIndex + 1) % currentArticles.size();
             displayArticle(currentArticles.get(currentArticleIndex));
 
@@ -74,6 +74,10 @@ public class HomeController extends ArticleHandler{
         resetThumbsButtons();
     }
 
+    private boolean isViewingRecommended = false; // Track if the user is viewing recommended articles
+
+
+
     @FXML
     public void handleCategorySelection(ActionEvent event) {
         Button selectedButton = (Button) event.getSource();
@@ -83,10 +87,11 @@ public class HomeController extends ArticleHandler{
         int categoryId = categoryText.equals("home") ? 0 : getCategoryIdByName(categoryText);
 
         if (categoryId != -1) {
-            // Filter the articles by the selected category or fetch recommended articles for Home
             if (categoryId == 0) {
-                filterRecommendedArticles(); // Home category logic for recommended articles
+                isViewingRecommended = true; // Viewing recommended articles
+                filterRecommendedArticles();
             } else {
+                isViewingRecommended = false; // Viewing articles of a specific category
                 filterArticlesByCategory(categoryId);
             }
 
@@ -94,19 +99,31 @@ public class HomeController extends ArticleHandler{
                 contentHeader.setText("No articles found for " + categoryText);
                 webview.getEngine().loadContent("<html><body><p>No content available</p></body></html>");
             } else {
-                displayArticle(currentArticles.get(currentArticleIndex)); // Display first article
+                currentArticleIndex = 0; // Reset to the first article
+                displayArticle(currentArticles.get(currentArticleIndex));
             }
         }
     }
 
+
     @FXML
     public void filterArticlesByCategory(int categoryId) {
-
         currentArticles.clear();
+
+        // Populate articles for the selected category
         populateArticlesForCategory(categoryId);
 
-        // add all articles for this category to the currentArticles list
-        currentArticles.addAll(findCategoryById(categoryId).getArticlesForThisCategory());
+        // Add all articles for this category to the currentArticles list
+        Category category = findCategoryById(categoryId);
+        if (category != null) {
+            currentArticles.addAll(category.getArticlesForThisCategory());
+        }
+
+        if (currentArticles.isEmpty()) {
+            System.out.println("No articles found for category ID: " + categoryId);
+        } else {
+            System.out.println("Articles loaded for category: " + category.getCategoryName());
+        }
 
         currentArticleIndex = 0; // Reset to the first article
     }
@@ -137,30 +154,17 @@ public class HomeController extends ArticleHandler{
         currentArticleIndex = 0; // Reset to the first article
     }
 
-
-
     @FXML
     private void displayArticle(Article article) {
-
         this.startTime = System.currentTimeMillis(); // Set the start time when displaying the article
 
-
-        // Resolve the category name directly from the article
-        String category = "Unknown Category"; // Default value
-
-        if (article.getCategory() != null) {
-            category = article.getCategory().getCategoryName();
-        } else {
-            // Optional fallback if category objects are not set
-            // Add logic here if you have a way to map categoryId to category name
-        }
+        String category = article.getCategory() != null ? article.getCategory().getCategoryName() : "Unknown Category";
 
         // Set the content header
         contentHeader.setText(category);
 
         java.net.URL cssUrl = getClass().getResource("/org/project/mindpulse/articleStyles.css");
 
-        // HTML content linking to the external stylesheet
         String articleContent = "<html><head>" +
                 "<link rel='stylesheet' type='text/css' href='" + cssUrl.toExternalForm() + "' />" +
                 "</head><body>" +
@@ -171,12 +175,11 @@ public class HomeController extends ArticleHandler{
                 "<a href='" + article.getLinkToArticle() + "' target='_blank' class='article-button'>View the Full Article Here</a>" +
                 "</body></html>";
 
-        // Load content into WebView
         webview.getEngine().loadContent(articleContent);
 
-        // implement redirect to website source on desktop browser
-
+        System.out.println("Displaying article: " + article.getTitle());
     }
+
 
     private void recordInteraction(Article article) {
         long timeTakenMillis = System.currentTimeMillis() - this.startTime; // Calculate time taken for interaction
@@ -209,8 +212,6 @@ public class HomeController extends ArticleHandler{
         );
 
     }
-
-
 
     @FXML
     public void likedArticle(ActionEvent event) {
