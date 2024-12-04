@@ -34,17 +34,21 @@ public class ArticleHandler {
         }
     }
 
-    public int getCategoryIdByName(String categoryName) {
-        return switch (categoryName) {
-            case "sports" -> 5;
-            case "entertainment" -> 4;
-            case "education" -> 2;
-            case "politics" -> 3;
-            case "health" -> 1;
-            case "business" -> 6;
-            default -> -1; // Invalid category
-        };
+    public static int getCategoryIdByName(String categoryName) {
+        String query = "SELECT categoryid FROM Categories WHERE LOWER(categoryname) = LOWER(?)";
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, categoryName);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("categoryid");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Invalid category
     }
+
 
     // Method to save an article interaction into the database
     public void saveInteractionToDatabase(ArticleRecord interaction) {
@@ -166,39 +170,39 @@ public class ArticleHandler {
         }
     }
 
-    public void saveArticlesToDatabase(List<Article> articles) {
-        String checkQuery = "SELECT COUNT(*) FROM Articles WHERE Title = ? AND CategoryID = ? AND Content = ?";
-        String insertQuery = "INSERT INTO Articles (CategoryID, Title, AuthorName, dateOfPublish, content) VALUES (?, ?, ?, ?, ?)";
+    public static void saveArticleToDatabase(Article article) {
+        String checkQuery = "SELECT COUNT(*) FROM Articles WHERE Title = ? AND Content = ?";
+        String insertQuery = "INSERT INTO Articles (Categoryid, Title, AuthorName, DateOfPublish, Content) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            for (Article article : articles) {
-                try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
-                    checkStmt.setString(1, article.getTitle());
-                    checkStmt.setInt(2, article.getCategoryId());
-                    checkStmt.setString(3, article.getContent());
-                    ResultSet resultSet = checkStmt.executeQuery();
+            // Check for duplicates
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                checkStmt.setString(1, article.getTitle());
+                checkStmt.setString(2, article.getContent());
+                ResultSet resultSet = checkStmt.executeQuery();
 
-                    if (resultSet.next() && resultSet.getInt(1) > 0) {
-                        System.out.println("Duplicate article found: " + article.getTitle());
-                        continue;
-                    }
-                }
-
-                try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
-                    insertStmt.setInt(1, article.getCategoryId());
-                    insertStmt.setString(2, article.getTitle());
-                    insertStmt.setString(3, article.getAuthorName());
-                    insertStmt.setDate(4, article.getDateOfPublish());
-                    insertStmt.setString(5, article.getContent());
-                    insertStmt.executeUpdate();
-                    System.out.println("Article inserted: " + article.getTitle());
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    System.out.println("Duplicate article found: " + article.getTitle());
+                    return;
                 }
             }
+
+            // Insert article
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
+                insertStmt.setInt(1, article.getCategoryId());
+                insertStmt.setString(2, article.getTitle());
+                insertStmt.setString(3, article.getAuthorName());
+                insertStmt.setDate(4, article.getDateOfPublish());
+                insertStmt.setString(5, article.getContent());
+                insertStmt.executeUpdate();
+                System.out.println("Article inserted: " + article.getTitle());
+            }
         } catch (SQLException e) {
-            System.err.println("Error saving articles to the database: " + e.getMessage());
+            System.err.println("Error saving article to the database: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
 }
 

@@ -10,6 +10,7 @@ module org.project.mindpulse {
     requires org.apache.commons.text;
     requires javafx.controls;
     requires okhttp3;
+    requires com.fasterxml.jackson.annotation;
 
     opens org.project.mindpulse.Controllers to javafx.fxml;
     opens org.project.mindpulse.CoreModules to javafx.base;

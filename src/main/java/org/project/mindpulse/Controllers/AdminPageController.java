@@ -17,13 +17,8 @@ import org.project.mindpulse.CoreModules.Category;
 import org.project.mindpulse.CoreModules.User;
 import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Database.UserHandler;
-import org.project.mindpulse.Service.ArticleFetcher;
-import org.project.mindpulse.Service.ArticleSorter;
-import org.project.mindpulse.Service.CurrentsApiResponse;
-import org.project.mindpulse.Service.CurrentsApiResponse;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,9 +48,6 @@ public class AdminPageController implements GeneralFeatures {
     @FXML private Button deleteButton;
 
     @FXML private Button goTofetchArticles;
-
-    @FXML private Button fetchArticles;
-
 
     @FXML
     public void initialize() {
@@ -182,42 +174,8 @@ public class AdminPageController implements GeneralFeatures {
     }
 
     @FXML
-    public void fetchAndSaveArticles(ActionEvent event) {
-        try {
-            ArticleFetcher fetcher = new ArticleFetcher();
-            ArticleSorter sorter = new ArticleSorter();
-            ArticleHandler handler = new ArticleHandler();
-
-            // Fetch articles directly as List<Article>
-            List<Article> fetchedArticles = fetcher.fetchArticles();
-
-            // Categorize fetched articles
-            List<Article> categorizedArticles = new ArrayList<>();
-            for (Article article : fetchedArticles) {
-                // Assign category based on content
-                sorter.assignCategory(article);
-                if (article.getCategory() != null) {
-                    int categoryId = handler.getCategoryIdByName(article.getCategory().getCategoryName()); // Fetch category ID
-                    article.setCategoryId(categoryId); // Set category ID for the article
-                    categorizedArticles.add(article);
-                } else {
-                    System.out.println("Skipping article: " + article.getTitle() + " due to uncategorized content.");
-                }
-            }
-
-            // Save categorized articles to the database
-            handler.saveArticlesToDatabase(categorizedArticles);
-            displayConfirmation("Articles fetched and saved successfully!");
-        } catch (Exception e) {
-            displayError("Error fetching or saving articles: " + e.getMessage());
-        }
-    }
-
-
-
-    @FXML
     private void redirectToFetchingArticles(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/ArticleFetching.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/AddNewArticle.fxml"));
         Parent mainMenuWindow = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setTitle("Admin Portal");
