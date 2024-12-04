@@ -1,15 +1,14 @@
 package org.project.mindpulse.Service;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
 public class CurrentsApiResponse {
 
-    @SerializedName("status") // Map to exact JSON key
+    @SerializedName("status")
     private String status;
 
-    @SerializedName("news") // Map to exact JSON key
+    @SerializedName("news")
     private List<ArticleResponse> news;
 
     public String getStatus() {
@@ -77,5 +76,4 @@ public class CurrentsApiResponse {
             this.published = published;
         }
     }
-
 }

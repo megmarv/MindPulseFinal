@@ -28,6 +28,8 @@ public class Category {
         categories.add(new Category("Business", 6, "Business news, trends, and economy."));
     }
 
+    public Category() { }
+
     public String getCategoryName() {
         return categoryName;
     }

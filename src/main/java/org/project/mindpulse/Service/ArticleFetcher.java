@@ -6,13 +6,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.project.mindpulse.CoreModules.Article;
-import org.project.mindpulse.Database.ArticleHandler;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleFetcher {
@@ -34,35 +33,32 @@ public class ArticleFetcher {
             }
 
             String responseBody = response.body() != null ? response.body().string() : "";
-            System.out.println("Raw API Response: " + responseBody); // Debugging log
+            System.out.println("Raw API Response: " + responseBody);
 
             Gson gson = new GsonBuilder().setLenient().create();
             CurrentsApiResponse apiResponse = gson.fromJson(responseBody, CurrentsApiResponse.class);
 
+            if (apiResponse == null || apiResponse.getNews() == null) {
+                throw new NullPointerException("API response or news list is null.");
+            }
+
             List<Article> articles = new ArrayList<>();
             for (CurrentsApiResponse.ArticleResponse articleResponse : apiResponse.getNews()) {
-                Date publishedDate = parsePublishedDate(articleResponse.getPublished());
+                if (articleResponse == null) continue;
 
                 Article article = new Article(
-                        0,
-                        -1,
+                        0, // Default article ID
+                        -1, // Default category ID (to be updated later)
                         articleResponse.getTitle(),
-                        articleResponse.getAuthor(),
+                        articleResponse.getAuthor() != null ? articleResponse.getAuthor() : "Unknown Author",
                         articleResponse.getDescription(),
-                        publishedDate
+                        parsePublishedDate(articleResponse.getPublished())
                 );
 
-                // Debugging log for parsed articles
-                System.out.println("Parsed Article: " + article);
-
-                // Assign category
-                String category = ArticleSorter.assignCategory(article);
-                if (category != null) {
-                    int categoryId = new ArticleHandler().getCategoryIdByName(category);
-                    article.setCategoryId(categoryId);
-                }
-
+                ArticleSorter.assignCategory(article);
                 articles.add(article);
+
+                System.out.println("Processed Article: " + article.getTitle());
             }
 
             return articles;
@@ -71,22 +67,17 @@ public class ArticleFetcher {
         }
     }
 
-
-    /**
-     * Parses the published date from the API into a standard Date object.
-     *
-     * @param publishedDate The date as a string from the API response.
-     * @return The parsed Date object or the current date if parsing fails.
-     */
     private Date parsePublishedDate(String publishedDate) {
+        if (publishedDate == null || publishedDate.isEmpty()) {
+            return new Date(System.currentTimeMillis());
+        }
+
         SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
-            java.util.Date utilDate = apiDateFormat.parse(publishedDate);
-            return new Date(utilDate.getTime()); // Convert java.util.Date to java.sql.Date
+            return new Date(apiDateFormat.parse(publishedDate).getTime());
         } catch (ParseException e) {
             System.err.println("Failed to parse published date: " + publishedDate + ". Using current date instead.");
             return new Date(System.currentTimeMillis());
         }
     }
-
 }

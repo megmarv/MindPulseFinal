@@ -1,6 +1,7 @@
 package org.project.mindpulse.Service;
 
 import org.project.mindpulse.CoreModules.Article;
+import org.project.mindpulse.CoreModules.Category;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,15 +62,18 @@ public class ArticleSorter {
      * Assigns a category to the article based on its content.
      *
      * @param article The article to categorize.
-     * @return The category name, or null if no category is assigned.
+     * @return The category object, or null if no category is assigned.
      */
-    public static String assignCategory(Article article) {
-        String category = categorizeArticle(article.getContent());
-        if (category != null) {
-            System.out.println("Assigned Category: " + category + " to article: " + article.getTitle());
+    public static Category assignCategory(Article article) {
+        String categoryName = categorizeArticle(article.getContent());
+        if (categoryName != null) {
+            Category category = new Category(); // Replace with actual method to fetch Category object
+            category.setCategoryName(categoryName); // Assuming Category has a setName method
+            System.out.println("Assigned Category: " + category.getCategoryName()+ " to article: " + article.getTitle());
+            return category;
         } else {
             System.out.println("Unable to assign a category to article: " + article.getTitle());
+            return null;
         }
-        return category;
     }
 }

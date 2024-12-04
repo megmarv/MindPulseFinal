@@ -195,9 +195,9 @@ public class AdminPageController implements GeneralFeatures {
             List<Article> categorizedArticles = new ArrayList<>();
             for (Article article : fetchedArticles) {
                 // Assign category based on content
-                String category = sorter.assignCategory(article);
-                if (category != null) {
-                    int categoryId = handler.getCategoryIdByName(category); // Fetch category ID
+                sorter.assignCategory(article);
+                if (article.getCategory() != null) {
+                    int categoryId = handler.getCategoryIdByName(article.getCategory().getCategoryName()); // Fetch category ID
                     article.setCategoryId(categoryId); // Set category ID for the article
                     categorizedArticles.add(article);
                 } else {
