@@ -1,5 +1,7 @@
 package org.project.mindpulse.CoreModules;
 
+import org.project.mindpulse.Controllers.UserController;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,63 +13,10 @@ public class User {
     private String username;
     private String password;
 
-    private List<ArticleRecord> userHistory = new ArrayList<>(); // aggregation between user and ArticleRecord
-
-    // composition relationship
-    private List<UserPreferences> preferredCategories = new ArrayList<>();
-
-    public void addArticleRecord(ArticleRecord articleRecord) {
-        userHistory.add(articleRecord);
-        // Optionally log for debugging
-        System.out.println("Added to history: " + articleRecord.toString());
-    }
-
-    // Add a new preference
-    public void addPreference(int categoryId, int likes, int dislikes, int nullInteractions,double timeSpent) {
-        // Check if the category already exists
-        for (UserPreferences pref : preferredCategories) {
-            if (pref.getCategoryId() == categoryId) {
-                System.out.println("Category " + categoryId + " already exists. Use updatePreference instead.");
-                return;
-            }
-        }
-        // Add new preference
-        UserPreferences newPreference = new UserPreferences(categoryId, likes, dislikes, nullInteractions,timeSpent);
-        preferredCategories.add(newPreference);
-    }
-
-    // Update an existing preference
-    public void updatePreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent) {
-        for (UserPreferences pref : preferredCategories) {
-            if (pref.getCategoryId() == categoryId) {
-                pref.setLikes(pref.getLikes() + likes);
-                pref.setDislikes(pref.getDislikes() + dislikes);
-                pref.setNullInteractions(pref.getNullInteractions() + nullInteractions);
-                pref.setTimeSpent(pref.getTimeSpent() + timeSpent);
-                return;
-            }
-        }
-        // Add a new preference if it doesn't exist
-        addPreference(categoryId, likes, dislikes, nullInteractions, timeSpent);
-    }
+    private List<ArticleRecord> userHistory = new ArrayList<>(); // composition between user and ArticleRecord
+    private List<UserPreference> userPreferences = new ArrayList<>(); // composition between user and UserPreference
 
 
-    // Get a specific preference
-    public UserPreferences getPreference(int categoryId) {
-        for (UserPreferences pref : preferredCategories) {
-            if (pref.getCategoryId() == categoryId) {
-                return pref;
-            }
-        }
-        return null;
-    }
-
-    // Get all preferences
-    public List<UserPreferences> getAllPreferences() {
-        return new ArrayList<>(preferredCategories); // Return a copy to prevent external modification
-    }
-
-    // constructor without providing the userHistory and preferredCategories array lists
     public User(int userId, String name, String email, String username, String password) {
         this.userId = userId;
         this.name = name;
@@ -75,29 +24,50 @@ public class User {
         this.username = username;
         this.password = password;
         this.userHistory = new ArrayList<>();
-        this.preferredCategories = new ArrayList<>();
+        this.userPreferences = new ArrayList<>();
     }
 
-    // constructor providing all the required elements as parameters except for the preferredCategories
-    public User(int userId, String name, String email, String username, String password, List<ArticleRecord> articleRecords) {
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.userHistory = articleRecords;
-        this.preferredCategories = new ArrayList<>();
+    public void addArticleRecord(ArticleRecord articleRecord) {
+        userHistory.add(articleRecord);
+        System.out.println("Added to history: " + articleRecord.toString());
     }
 
-    // completely parameterized constructor
-    public User(int userId, String name, String email, String username,String password, List<ArticleRecord> articleRecords, List<UserPreferences> favouriteCategories) {
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.userHistory = articleRecords;
-        this.preferredCategories = favouriteCategories;
+    public void addOrUpdatePreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent) {
+        for (UserPreference pref : userPreferences) {
+            if (pref.getCategoryId() == categoryId) {
+                // Update the existing preference
+                pref.setLikes(pref.getLikes() + likes);
+                pref.setDislikes(pref.getDislikes() + dislikes);
+                pref.setNullInteractions(pref.getNullInteractions() + nullInteractions);
+                pref.setTimeSpent(pref.getTimeSpent() + timeSpent);
+                return; // Exit after updating
+            }
+        }
+
+        // If no existing preference found, add a new one
+        UserPreference newPreference = new UserPreference(categoryId, likes, dislikes, nullInteractions, timeSpent);
+        userPreferences.add(newPreference);
+        System.out.println("Added new preference for Category ID: " + categoryId);
+        System.out.println("Current Preferences:");
+        for (UserPreference pref : UserController.getLoggedInUser().getAllPreferences()) {
+            System.out.println("Category ID: " + pref.getCategoryId() + ", Total Score: " + pref.getTotalScore());
+        }
+
+    }
+
+
+    public UserPreference getPreferenceWithCategoryId(int categoryId) {
+        for (UserPreference pref : userPreferences) {
+            if (pref.getCategoryId() == categoryId) {
+                return pref;
+            }
+        }
+        return null;
+    }
+
+
+    public List<UserPreference> getAllPreferences() {
+        return userPreferences;
     }
 
     public List<ArticleRecord> getUserHistory() {
@@ -156,4 +126,5 @@ public class User {
         }
         return false;
     }
+
 }

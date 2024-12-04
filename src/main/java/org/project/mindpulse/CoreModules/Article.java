@@ -7,17 +7,14 @@ import java.util.List;
 public class Article {
 
     private int articleId;
-    private int categoryId; // Foreign key from the database
+    private int categoryId;
     private String title;
     private String authorName;
     private String content;
     private Date dateOfPublish;
 
-    private Category category; // aggregation pointer
-
-    private List<ArticleRecord> articleHistory = new ArrayList<>();
-
-    // Static list to store all articles
+    private Category category; // aggregation between category and article
+    private List<ArticleRecord> articleHistory = new ArrayList<>(); // composition relationship between article and articleRecord but never used
     public static List<Article> articleList = new ArrayList<>(); // Static list for holding all articles
 
     public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish) {
@@ -30,7 +27,7 @@ public class Article {
         this.articleHistory = new ArrayList<>();
     }
 
-    // Set the associated Category object based on categoryId
+    // Set the associated Category object based on categoryId for aggregation pointer
     public void setCategory(Category category) {
         if (category.getCategoryID() == this.categoryId) {
             this.category = category;

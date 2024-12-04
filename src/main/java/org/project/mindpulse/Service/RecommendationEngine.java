@@ -1,52 +1,15 @@
 package org.project.mindpulse.Service;
 
-import org.project.mindpulse.Controllers.UserController;
 import org.project.mindpulse.CoreModules.*;
-import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Database.UserHandler;
+import org.apache.commons.text.similarity.CosineSimilarity;
 
-import javax.swing.text.AbstractDocument;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.text.similarity.CosineSimilarity;
-
 public class RecommendationEngine {
 
-    public static int categoryToRecommend;
-
-    public static double findSimilarity(Article article1, Article article2) {
-        CosineSimilarity similarity = new CosineSimilarity();
-
-        // Get article content as CharSequences
-        CharSequence left = article1.getContent();
-        CharSequence right = article2.getContent();
-
-        if (left == null || right == null) {
-            System.err.println("Article content is null. Similarity cannot be calculated.");
-            return 0.0;
-        }
-
-        Map<CharSequence, Integer> leftVector = toVector(left);
-        Map<CharSequence, Integer> rightVector = toVector(right);
-
-        double result = similarity.cosineSimilarity(leftVector, rightVector);
-        System.out.println("Calculated similarity: " + result + " for articles: "
-                + article1.getArticleId() + " & " + article2.getArticleId());
-        return result;
-    }
-
-    private static Map<CharSequence, Integer> toVector(CharSequence content) {
-        Map<CharSequence, Integer> frequencyMap = new HashMap<>();
-        for (String word : content.toString().toLowerCase().split("\\W+")) {
-            frequencyMap.put(word, frequencyMap.getOrDefault(word, 0) + 1);
-        }
-        return frequencyMap;
-    }
-
     public static List<Article> recommendArticles(User user) {
-        assumePreferences(user);
-
         Map<Article, Double> articleSimilarityMap = new HashMap<>();
         List<Article> userHistory = UserHandler.getUserArticlesForRecommendation(user);
 
@@ -54,6 +17,8 @@ public class RecommendationEngine {
             System.out.println("User history is empty. Unable to generate recommendations.");
             return Collections.emptyList();
         }
+
+        int categoryToRecommend = assumePreferences(user);
 
         Category category = Category.getCategories()
                 .stream()
@@ -67,6 +32,13 @@ public class RecommendationEngine {
         }
 
         List<Article> articlesForThisCategory = category.getArticlesForThisCategory();
+
+        // Debug: Log articles for this category
+        System.out.println("Articles for Category ID " + categoryToRecommend + ":");
+        for (Article article : articlesForThisCategory) {
+            System.out.println("Article ID: " + article.getArticleId() + ", Title: " + article.getTitle());
+        }
+
         if (articlesForThisCategory.isEmpty()) {
             System.out.println("No articles available for category: " + category.getCategoryName());
             return Collections.emptyList();
@@ -88,32 +60,58 @@ public class RecommendationEngine {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        System.out.println("Recommended Articles: " + sortedArticles);
+        System.out.println("Recommended Articles:");
+        for (Article article : sortedArticles) {
+            System.out.println("Article ID: " + article.getArticleId() + ", Title: " + article.getTitle());
+        }
         return sortedArticles;
     }
 
-    public static void assumePreferences(User user) {
+
+    private static double findSimilarity(Article article1, Article article2) {
+        CosineSimilarity similarity = new CosineSimilarity();
+        Map<CharSequence, Integer> vector1 = toVector(article1.getContent());
+        Map<CharSequence, Integer> vector2 = toVector(article2.getContent());
+
+        return similarity.cosineSimilarity(vector1, vector2);
+    }
+
+    private static Map<CharSequence, Integer> toVector(String content) {
+        Map<CharSequence, Integer> vector = new HashMap<>();
+        for (String word : content.toLowerCase().split("\\W+")) {
+            vector.put(word, vector.getOrDefault(word, 0) + 1);
+        }
+        return vector;
+    }
+
+    public static int assumePreferences(User user) {
+        int categoryToRecommend = 0;
+
         UserHandler.populateUserHistory(user);
         UserHandler.populateUserPreferences(user);
 
-        double timeWeight = 0.4, likeWeight = 0.7, dislikeWeight = -0.5, nullWeight = 0.1;
-
-        for (UserPreferences preference : user.getAllPreferences()) {
-            double score = preference.getLikes() * likeWeight +
-                    preference.getDislikes() * dislikeWeight +
-                    preference.getNullInteractions() * nullWeight +
-                    preference.getTimeSpent() * timeWeight;
-
-            preference.setTotalScore(score);
-            System.out.println("Category " + preference.getCategoryId() + " Score: " + score);
+        // Debug: Log all preferences before sorting
+        System.out.println("User Preferences Before Sorting:");
+        for (UserPreference preference : user.getAllPreferences()) {
+            System.out.println("Category ID: " + preference.getCategoryId() + ", Total Score: " + preference.getTotalScore());
         }
 
-        user.getAllPreferences().sort(Comparator.comparingDouble(UserPreferences::getTotalScore).reversed());
+        // Sort preferences in descending order of total score
+        user.getAllPreferences().sort(Comparator.comparingDouble(UserPreference::getTotalScore).reversed());
+
+        // Debug: Log the sorted preferences
+        System.out.println("User Preferences After Sorting:");
+        for (UserPreference preference : user.getAllPreferences()) {
+            System.out.println("Category ID: " + preference.getCategoryId() + ", Total Score: " + preference.getTotalScore());
+        }
+
         if (!user.getAllPreferences().isEmpty()) {
             categoryToRecommend = user.getAllPreferences().get(0).getCategoryId();
             System.out.println("Selected Category for Recommendation: " + categoryToRecommend);
         } else {
             System.out.println("No preferences found for user.");
         }
+        return categoryToRecommend;
     }
+
 }

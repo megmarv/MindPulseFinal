@@ -9,21 +9,13 @@ public class Category {
     private int categoryID;
     private String categoryDescription;
 
-    // Static list to hold predefined categories
-    private static final List<Category> categories = new ArrayList<>();
-
-    private List<Article> articlesForThisCategory = new ArrayList<Article>();  // aggregation pointer
-
-    public void addArticle(Article article) {
-        articlesForThisCategory.add(article);
-        article.setCategory(this);
-    }
+    private static final List<Category> categories = new ArrayList<>();  // Static list to hold predefined categories
+    private  List<Article> articlesForThisCategory = new ArrayList<>();  // aggregation between category and article
 
     public Category(String categoryName, int categoryID, String categoryDescription) {
         this.categoryName = categoryName;
         this.categoryID = categoryID;
         this.categoryDescription = categoryDescription;
-        this.articlesForThisCategory = new ArrayList<>();
     }
 
     // Static block to initialize predefined categories
@@ -38,6 +30,11 @@ public class Category {
 
     public String getCategoryName() {
         return categoryName;
+    }
+
+    public void addArticle(Article article) {
+        articlesForThisCategory.add(article);
+        article.setCategory(this);
     }
 
     public void setCategoryName(String categoryName) {

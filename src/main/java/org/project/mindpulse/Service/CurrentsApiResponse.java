@@ -1,10 +1,15 @@
 package org.project.mindpulse.Service;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
-public class currentsApiResponse {
+public class CurrentsApiResponse {
 
+    @SerializedName("status") // Map to exact JSON key
     private String status;
+
+    @SerializedName("news") // Map to exact JSON key
     private List<ArticleResponse> news;
 
     public String getStatus() {
@@ -17,52 +22,60 @@ public class currentsApiResponse {
 
     public static class ArticleResponse {
 
+        @SerializedName("id")
         private String id;
+
+        @SerializedName("title")
         private String title;
+
+        @SerializedName("description")
         private String description;
+
+        @SerializedName("author")
         private String author;
+
+        @SerializedName("published")
         private String published;
 
         public String getId() {
             return id;
         }
 
-        public void setId(String id) {
-            this.id = id;
-        }
-
         public String getTitle() {
             return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
         }
 
         public String getDescription() {
             return description;
         }
 
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
         public String getAuthor() {
             return author;
-        }
-
-        public void setAuthor(String author) {
-            this.author = author;
         }
 
         public String getPublished() {
             return published;
         }
 
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public void setAuthor(String author) {
+            this.author = author;
+        }
+
         public void setPublished(String published) {
             this.published = published;
         }
-
     }
 
 }

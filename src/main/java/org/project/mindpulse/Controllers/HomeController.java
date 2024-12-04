@@ -202,7 +202,7 @@ public class HomeController extends ArticleHandler{
         );
 
         saveInteractionToDatabase(interaction); // Save to DB
-        loggedInUser.updatePreference(
+        loggedInUser.addOrUpdatePreference(
                 article.getCategoryId(),
                 liked ? 1 : 0,
                 disliked ? 1 : 0,

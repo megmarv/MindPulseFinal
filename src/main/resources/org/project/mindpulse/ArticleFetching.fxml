@@ -55,7 +55,7 @@
                                         <Button fx:id="viewUsers" layoutX="53.0" layoutY="184.0" mnemonicParsing="false" onAction="#viewUsers" prefHeight="30.0" prefWidth="94.0" styleClass="logout" text="Users" />
                                         <Button fx:id="viewArticles" layoutX="53.0" layoutY="239.0" mnemonicParsing="false" onAction="#viewArticles" prefHeight="30.0" prefWidth="94.0" styleClass="logout" text="Articles" />
                                         <Button fx:id="logOut" layoutX="48.0" layoutY="495.0" mnemonicParsing="false" onAction="#backToMain" prefHeight="21.0" prefWidth="98.0" styleClass="logout" text="Log out" />
-                              <Button fx:id="fetchArticles" layoutX="51.0" layoutY="294.0" mnemonicParsing="false" onAction="#fetchAndSaveArticles" prefHeight="31.0" prefWidth="99.0" styleClass="logout" text="Fetch Articles" />
+                              <Button  layoutX="51.0" layoutY="294.0" mnemonicParsing="false" fx:id="goTofetchArticles" onAction="#redirectToFetchingArticles" prefHeight="31.0" prefWidth="99.0" styleClass="logout" text="Fetch Articles" />
                                     </children></AnchorPane>
                             </children>
                         </AnchorPane>
@@ -68,7 +68,7 @@
                                         <String fx:value="white-bg" />
                                         <String fx:value="shadow" />
                                     </styleClass>                                    <children>
-                                    <Button fx:id="deleteButton" layoutX="380.0" layoutY="237.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="27.0" prefWidth="113.0" styleClass="rateArticle" text="Fetch Articles" />
+                                    <Button fx:id="fetchArticles" onAction="#fetchAndSaveArticles" layoutX="380.0" layoutY="237.0" mnemonicParsing="false"  prefHeight="27.0" prefWidth="113.0" styleClass="rateArticle" text="Fetch Articles" />
                               <Label layoutX="238.0" layoutY="162.0" text="50 articles will be fetched randomly and processed before saving to the database " />
                               <Label layoutX="380.0" layoutY="196.0" text="Source : Currents API" />
                                 </children></AnchorPane>

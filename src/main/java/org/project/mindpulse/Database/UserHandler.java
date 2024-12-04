@@ -143,7 +143,7 @@ public class UserHandler {
     // Method to return a list of Article objects for the Recommendation Engine
     public static List<Article> getUserArticlesForRecommendation(User user) {
         List<Article> userArticles = new ArrayList<>();
-        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish" +
+        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish " +
                 "FROM ArticleInteractions ai " +
                 "JOIN Articles a ON ai.articleId = a.articleId " +
                 "WHERE ai.userId = ?";
@@ -178,7 +178,7 @@ public class UserHandler {
 
     // Method to populate all user preferences
     public static void populateUserPreferences(User user) {
-            String query = """
+        String query = """
         SELECT 
             categoryid,
             COUNT(CASE WHEN rating = 'like' THEN 1 END) AS likes,
@@ -203,15 +203,24 @@ public class UserHandler {
                 int nullRatings = resultSet.getInt("nullratings");
                 double timeSpent = resultSet.getDouble("totalTimeSpent");
 
-                user.updatePreference(categoryId, likes, dislikes, nullRatings, timeSpent);
-                System.out.println("Updated Preferences: " + user.getAllPreferences());
-                System.out.println("Category ID: " + categoryId + ", Time Spent: " + timeSpent + " seconds");
+                // Debug statements
+                System.out.println("Retrieved User Preference:");
+                System.out.println("Category ID: " + categoryId);
+                System.out.println("Likes: " + likes);
+                System.out.println("Dislikes: " + dislikes);
+                System.out.println("Null Ratings: " + nullRatings);
+                System.out.println("Total Time Spent: " + timeSpent + " seconds");
 
+                // Add or update the preference
+                user.addOrUpdatePreference(categoryId, likes, dislikes, nullRatings, timeSpent);
             }
         } catch (SQLException e) {
+            System.err.println("Error populating user preferences: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+
 
 
 

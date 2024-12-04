@@ -19,7 +19,8 @@ import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Database.UserHandler;
 import org.project.mindpulse.Service.ArticleFetcher;
 import org.project.mindpulse.Service.ArticleSorter;
-import org.project.mindpulse.Service.currentsApiResponse;
+import org.project.mindpulse.Service.CurrentsApiResponse;
+import org.project.mindpulse.Service.CurrentsApiResponse;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -187,26 +188,32 @@ public class AdminPageController implements GeneralFeatures {
             ArticleSorter sorter = new ArticleSorter();
             ArticleHandler handler = new ArticleHandler();
 
-            List<currentsApiResponse.ArticleResponse> fetchedArticles = fetcher.fetchArticles();
+            // Fetch articles directly as List<Article>
+            List<Article> fetchedArticles = fetcher.fetchArticles();
+
+            // Categorize fetched articles
             List<Article> categorizedArticles = new ArrayList<>();
-
-            for (currentsApiResponse.ArticleResponse response : fetchedArticles) {
-                String category = sorter.assignCategory(response.getTitle(), response.getDescription());
-                int categoryId = handler.getCategoryIdByName(category); // Fetch category ID from DB or predefined list
-
-                Article article = new Article(0, categoryId, response.getTitle(), response.getAuthor(),
-                        response.getDescription(), Date.valueOf(response.getPublished()));
-
-
-                categorizedArticles.add(article);
+            for (Article article : fetchedArticles) {
+                // Assign category based on content
+                String category = sorter.assignCategory(article);
+                if (category != null) {
+                    int categoryId = handler.getCategoryIdByName(category); // Fetch category ID
+                    article.setCategoryId(categoryId); // Set category ID for the article
+                    categorizedArticles.add(article);
+                } else {
+                    System.out.println("Skipping article: " + article.getTitle() + " due to uncategorized content.");
+                }
             }
 
+            // Save categorized articles to the database
             handler.saveArticlesToDatabase(categorizedArticles);
             displayConfirmation("Articles fetched and saved successfully!");
         } catch (Exception e) {
             displayError("Error fetching or saving articles: " + e.getMessage());
         }
     }
+
+
 
     @FXML
     private void redirectToFetchingArticles(ActionEvent event) throws IOException {
