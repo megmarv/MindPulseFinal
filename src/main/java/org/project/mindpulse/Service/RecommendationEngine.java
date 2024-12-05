@@ -3,68 +3,67 @@ package org.project.mindpulse.Service;
 import org.project.mindpulse.CoreModules.*;
 import org.project.mindpulse.Database.UserHandler;
 import org.apache.commons.text.similarity.CosineSimilarity;
+import org.project.mindpulse.Database.ArticleHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class RecommendationEngine {
 
+    private static final int INTERACTION_THRESHOLD = 5;
+
     public static List<Article> recommendArticles(User user) {
-        Map<Article, Double> articleSimilarityMap = new HashMap<>();
+        // Step 1: Retrieve user preferences
+        List<UserPreference> preferences = UserHandler.getUserPreferences(user);
+
+        // Step 2: Determine the top category based on NormalizedScore
+        if (preferences.isEmpty()) {
+            System.out.println("No preferences found for the user. Unable to recommend.");
+            return Collections.emptyList();
+        }
+
+        preferences.sort(Comparator.comparingDouble(UserPreference::getTotalScore).reversed());
+        int topCategoryId = preferences.get(0).getCategoryId();
+        System.out.println("Top category for recommendation: " + topCategoryId);
+
+        // Step 3: Fetch articles for the top category
+        List<Article> categoryArticles = new ArrayList<>(); // Declare outside the block
+        Category topCategory = ArticleHandler.findCategoryById(topCategoryId);
+        if (topCategory != null) {
+            topCategory.populateArticlesForThisCategory();
+            categoryArticles = topCategory.getArticlesForThisCategory();
+        }
+
+        // Step 4: Fetch user's article history
         List<Article> userHistory = UserHandler.getUserArticlesForRecommendation(user);
 
-        if (userHistory.isEmpty()) {
-            System.out.println("User history is empty. Unable to generate recommendations.");
-            return Collections.emptyList();
-        }
-
-        int categoryToRecommend = assumePreferences(user);
-
-        Category category = Category.getCategories()
-                .stream()
-                .filter(c -> c.getCategoryID() == categoryToRecommend)
-                .findFirst()
-                .orElse(null);
-
-        if (category == null) {
-            System.out.println("No category found with ID: " + categoryToRecommend);
-            return new ArrayList<>();
-        }
-
-        List<Article> articlesForThisCategory = category.getArticlesForThisCategory();
-
-        // Debug: Log articles for this category
-        System.out.println("Articles for Category ID " + categoryToRecommend + ":");
-        for (Article article : articlesForThisCategory) {
-            System.out.println("Article ID: " + article.getArticleId() + ", Title: " + article.getTitle());
-        }
-
-        if (articlesForThisCategory.isEmpty()) {
-            System.out.println("No articles available for category: " + category.getCategoryName());
-            return Collections.emptyList();
-        }
-
-        for (Article history : userHistory) {
-            for (Article article : articlesForThisCategory) {
-                if (user.hasInteractedWithArticle(article.getArticleId())) {
-                    continue; // Skip articles already interacted with
-                }
-                double similarity = findSimilarity(article, history);
-                articleSimilarityMap.put(article, Math.max(articleSimilarityMap.getOrDefault(article, 0.0), similarity));
+        // Step 5: Compute similarity and skip already interacted articles
+        Map<Article, Double> similarityMap = new HashMap<>();
+        for (Article categoryArticle : categoryArticles) {
+            if (user.hasInteractedWithArticle(categoryArticle.getArticleId())) {
+                continue; // Skip already interacted articles
             }
+            double maxSimilarity = 0.0;
+            for (Article historyArticle : userHistory) {
+                double similarity = findSimilarity(categoryArticle, historyArticle);
+                maxSimilarity = Math.max(maxSimilarity, similarity);
+            }
+            similarityMap.put(categoryArticle, maxSimilarity);
         }
 
-        List<Article> sortedArticles = articleSimilarityMap.entrySet()
+        // Step 6: Sort articles by similarity index in descending order
+        List<Article> sortedRecommendations = similarityMap.entrySet()
                 .stream()
                 .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        System.out.println("Recommended Articles:");
-        for (Article article : sortedArticles) {
+        System.out.println("Recommended articles for the user:");
+        for (Article article : sortedRecommendations) {
             System.out.println("Article ID: " + article.getArticleId() + ", Title: " + article.getTitle());
         }
-        return sortedArticles;
+
+        return sortedRecommendations;
     }
 
 
@@ -72,7 +71,6 @@ public class RecommendationEngine {
         CosineSimilarity similarity = new CosineSimilarity();
         Map<CharSequence, Integer> vector1 = toVector(article1.getContent());
         Map<CharSequence, Integer> vector2 = toVector(article2.getContent());
-
         return similarity.cosineSimilarity(vector1, vector2);
     }
 
@@ -83,35 +81,4 @@ public class RecommendationEngine {
         }
         return vector;
     }
-
-    public static int assumePreferences(User user) {
-        int categoryToRecommend = 0;
-
-        UserHandler.populateUserHistory(user);
-        UserHandler.populateUserPreferences(user);
-
-        // Debug: Log all preferences before sorting
-        System.out.println("User Preferences Before Sorting:");
-        for (UserPreference preference : user.getAllPreferences()) {
-            System.out.println("Category ID: " + preference.getCategoryId() + ", Total Score: " + preference.getTotalScore());
-        }
-
-        // Sort preferences in descending order of total score
-        user.getAllPreferences().sort(Comparator.comparingDouble(UserPreference::getTotalScore).reversed());
-
-        // Debug: Log the sorted preferences
-        System.out.println("User Preferences After Sorting:");
-        for (UserPreference preference : user.getAllPreferences()) {
-            System.out.println("Category ID: " + preference.getCategoryId() + ", Total Score: " + preference.getTotalScore());
-        }
-
-        if (!user.getAllPreferences().isEmpty()) {
-            categoryToRecommend = user.getAllPreferences().get(0).getCategoryId();
-            System.out.println("Selected Category for Recommendation: " + categoryToRecommend);
-        } else {
-            System.out.println("No preferences found for user.");
-        }
-        return categoryToRecommend;
-    }
-
 }

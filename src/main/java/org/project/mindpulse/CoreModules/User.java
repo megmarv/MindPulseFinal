@@ -32,30 +32,6 @@ public class User {
         System.out.println("Added to history: " + articleRecord.toString());
     }
 
-    public void addOrUpdatePreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent) {
-        for (UserPreference pref : userPreferences) {
-            if (pref.getCategoryId() == categoryId) {
-                // Update the existing preference
-                pref.setLikes(pref.getLikes() + likes);
-                pref.setDislikes(pref.getDislikes() + dislikes);
-                pref.setNullInteractions(pref.getNullInteractions() + nullInteractions);
-                pref.setTimeSpent(pref.getTimeSpent() + timeSpent);
-                return; // Exit after updating
-            }
-        }
-
-        // If no existing preference found, add a new one
-        UserPreference newPreference = new UserPreference(categoryId, likes, dislikes, nullInteractions, timeSpent);
-        userPreferences.add(newPreference);
-        System.out.println("Added new preference for Category ID: " + categoryId);
-        System.out.println("Current Preferences:");
-        for (UserPreference pref : UserController.getLoggedInUser().getAllPreferences()) {
-            System.out.println("Category ID: " + pref.getCategoryId() + ", Total Score: " + pref.getTotalScore());
-        }
-
-    }
-
-
     public UserPreference getPreferenceWithCategoryId(int categoryId) {
         for (UserPreference pref : userPreferences) {
             if (pref.getCategoryId() == categoryId) {

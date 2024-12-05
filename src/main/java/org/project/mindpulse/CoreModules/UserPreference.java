@@ -9,17 +9,14 @@ public class UserPreference {
     private double timeSpent;
     private double totalScore;
 
-    double timeWeight = 0.4, likeWeight = 0.7, dislikeWeight = -0.5, nullWeight = 0.1;
 
-    public UserPreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent) {
+    public UserPreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent, double totalScore) {
         this.categoryId = categoryId;
         this.likes = likes;
         this.dislikes = dislikes;
         this.nullInteractions = nullInteractions;
         this.timeSpent = timeSpent;
-
-        // calculating the total score for each category based on likes, dislikes, null interactions and timeTaken with the help of predefined weights
-        this.totalScore = likes*likeWeight+dislikes*dislikeWeight+nullInteractions*nullWeight+timeSpent*timeWeight;
+        this.totalScore = totalScore;
     }
 
     public void addLike(int likes) {

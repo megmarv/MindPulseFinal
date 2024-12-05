@@ -1,5 +1,6 @@
 package org.project.mindpulse.CoreModules;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,11 @@ public class Category {
     private String categoryDescription;
 
     private static final List<Category> categories = new ArrayList<>();  // Static list to hold predefined categories
-    private  List<Article> articlesForThisCategory = new ArrayList<>();  // aggregation between category and article
+    private List<Article> articlesForThisCategory = new ArrayList<>();  // Aggregation between category and article
+
+    private static final String URL = "jdbc:postgresql://localhost:5432/MindPulse";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "aaqib2004";
 
     public Category(String categoryName, int categoryID, String categoryDescription) {
         this.categoryName = categoryName;
@@ -28,44 +33,47 @@ public class Category {
         categories.add(new Category("Business", 6, "Business news, trends, and economy."));
     }
 
-    public Category(String categoryName) {
-        this.categoryName = categoryName;
+    // Method to populate articles for this category
+    public void populateArticlesForThisCategory() {
+        articlesForThisCategory.clear(); // Clear existing articles
+
+        String query = "SELECT * FROM Articles WHERE CategoryID = ?";
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, categoryID);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int articleId = resultSet.getInt("ArticleID");
+                String title = resultSet.getString("Title");
+                String authorName = resultSet.getString("AuthorName");
+                String content = resultSet.getString("Content");
+                Date dateOfPublish = resultSet.getDate("DateOfPublish");
+
+                // Create and add the Article to the list
+                Article article = new Article(articleId, categoryID, title, authorName, content, dateOfPublish);
+                articlesForThisCategory.add(article);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error populating articles for category ID " + categoryID + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void addArticle(Article article) {
-        articlesForThisCategory.add(article);
-        article.setCategory(this);
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public int getCategoryID() {
-        return categoryID;
-    }
-
-    public void setCategoryID(int categoryID) {
-        this.categoryID = categoryID;
-    }
-
-    public String getCategoryDescription() {
-        return categoryDescription;
-    }
-
-    public void setCategoryDescription(String categoryDescription) {
-        this.categoryDescription = categoryDescription;
+    public List<Article> getArticlesForThisCategory() {
+        return articlesForThisCategory;
     }
 
     public static List<Category> getCategories() {
         return categories;
     }
 
-    public List<Article> getArticlesForThisCategory() {
-        return articlesForThisCategory;
+    public int getCategoryID() {
+        return categoryID;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
     }
 }

@@ -3,6 +3,7 @@ package org.project.mindpulse.Database;
 import org.project.mindpulse.CoreModules.Article;
 import org.project.mindpulse.CoreModules.ArticleRecord;
 import org.project.mindpulse.CoreModules.User;
+import org.project.mindpulse.CoreModules.UserPreference;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -177,47 +178,44 @@ public class UserHandler {
 
 
     // Method to populate all user preferences
-    public static void populateUserPreferences(User user) {
+    public static List<UserPreference> getUserPreferences(User user) {
+        List<UserPreference> userPreferences = new ArrayList<>();
+
+        // SQL query to retrieve user preferences
         String query = """
-        SELECT 
-            categoryid,
-            COUNT(CASE WHEN rating = 'like' THEN 1 END) AS likes,
-            COUNT(CASE WHEN rating = 'dislike' THEN 1 END) AS dislikes,
-            COUNT(CASE WHEN rating = 'none' THEN 1 END) AS nullratings,
-            SUM(EXTRACT(EPOCH FROM timetaken)) AS totalTimeSpent
-        FROM ArticleInteractions
-        WHERE userid = ?
-        GROUP BY categoryid;
-    """;
+            SELECT CategoryID, Likes, Dislikes, NullInteractions, TimeSpent, NormalizedScore
+            FROM UserPreferences
+            WHERE UserID = ?;
+        """;
 
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
 
+            // Set the user ID in the query
             statement.setInt(1, user.getUserId());
+
+            // Execute the query
             ResultSet resultSet = statement.executeQuery();
 
+            // Iterate through the result set and create UserPreference objects
             while (resultSet.next()) {
-                int categoryId = resultSet.getInt("categoryid");
-                int likes = resultSet.getInt("likes");
-                int dislikes = resultSet.getInt("dislikes");
-                int nullRatings = resultSet.getInt("nullratings");
-                double timeSpent = resultSet.getDouble("totalTimeSpent");
+                int categoryId = resultSet.getInt("CategoryID");
+                int likes = resultSet.getInt("Likes");
+                int dislikes = resultSet.getInt("Dislikes");
+                int nullInteractions = resultSet.getInt("NullInteractions");
+                double timeSpent = resultSet.getDouble("TimeSpent");
+                double totalScore = resultSet.getDouble("NormalizedScore");
 
-                // Debug statements
-                System.out.println("Retrieved User Preference:");
-                System.out.println("Category ID: " + categoryId);
-                System.out.println("Likes: " + likes);
-                System.out.println("Dislikes: " + dislikes);
-                System.out.println("Null Ratings: " + nullRatings);
-                System.out.println("Total Time Spent: " + timeSpent + " seconds");
-
-                // Add or update the preference
-                user.addOrUpdatePreference(categoryId, likes, dislikes, nullRatings, timeSpent);
+                // Create a UserPreference object and add it to the list
+                UserPreference preference = new UserPreference(categoryId, likes, dislikes, nullInteractions, timeSpent, totalScore);
+                userPreferences.add(preference);
             }
         } catch (SQLException e) {
-            System.err.println("Error populating user preferences: " + e.getMessage());
+            System.err.println("Error retrieving user preferences: " + e.getMessage());
             e.printStackTrace();
         }
+
+        return userPreferences;
     }
 
 

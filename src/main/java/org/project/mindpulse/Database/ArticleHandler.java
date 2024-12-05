@@ -75,43 +75,8 @@ public class ArticleHandler {
         }
     }
 
-    // Method to populate articles for a specific category
-    public void populateArticlesForCategory(int categoryId) {
-        // Find the corresponding Category instance
-        Category category = findCategoryById(categoryId);
-        if (category == null) {
-            System.out.println("Category with ID " + categoryId + " not found.");
-            return;
-        }
-
-        String query = "SELECT * FROM Articles WHERE categoryId = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setInt(1, categoryId);
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                int articleId = resultSet.getInt("articleId");
-                String title = resultSet.getString("title");
-                String authorName = resultSet.getString("authorName");
-                String content = resultSet.getString("content");
-                Date dateOfPublish = resultSet.getDate("dateOfPublish");
-
-                // Create an Article object
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
-
-                // Add the article to the category's list
-                category.addArticle(article);
-            }
-            System.out.println("Articles populated for category: " + category.getCategoryName());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     // Helper method to find a Category by its ID
-    public Category findCategoryById(int categoryId) {
+    public static Category findCategoryById(int categoryId) {
         for (Category category : Category.getCategories()) {
             if (category.getCategoryID() == categoryId) {
                 return category;
