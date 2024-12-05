@@ -41,12 +41,18 @@ public class HomeController extends ArticleHandler {
 
         User loggedInUser = UserController.getLoggedInUser();
         if (loggedInUser != null) {
-            filterRecommendedArticles();
+            if (loggedInUser.getUserHistory().size() >= 5) {
+                filterRecommendedArticles();
+            } else {
+                System.out.println("User must read at least 5 articles before accessing recommendations.");
+                webview.getEngine().loadContent("<html><body><p>Read at least 5 articles to get personalized recommendations.</p></body></html>");
+            }
         } else {
             System.out.println("No user logged in, Unable to load recommended articles");
             webview.getEngine().loadContent("<html><body><p>Error Loading Content --> UserException </p></body></html>");
         }
     }
+
 
     public void updateUserLabel(String userName) {
         user.setText(userName);
@@ -155,7 +161,6 @@ public class HomeController extends ArticleHandler {
         }
 
         List<Article> recommendedArticles = RecommendationEngine.recommendArticles(loggedInUser);
-        recommendedArticles.removeIf(article -> loggedInUser.hasInteractedWithArticle(article.getArticleId()));
 
         currentArticles.clear();
         currentArticles.addAll(recommendedArticles);
@@ -170,6 +175,7 @@ public class HomeController extends ArticleHandler {
         currentArticleIndex = 0;
     }
 
+
     private void recordInteraction(Article article) {
         long timeTakenMillis = System.currentTimeMillis() - this.startTime;
 
@@ -179,6 +185,7 @@ public class HomeController extends ArticleHandler {
             return;
         }
 
+        // Record interaction as null (neither liked nor disliked)
         ArticleRecord interaction = new ArticleRecord(
                 0,
                 article.getArticleId(),
@@ -190,10 +197,11 @@ public class HomeController extends ArticleHandler {
         );
 
         saveInteractionToDatabase(interaction);
-
         loggedInUser.addArticleRecord(interaction);
+
         System.out.println("Interaction recorded for user: " + loggedInUser.getUsername() + " with article ID: " + article.getArticleId());
     }
+
 
     @FXML
     private void displayArticle(Article article) {
