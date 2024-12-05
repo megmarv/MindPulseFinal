@@ -21,7 +21,7 @@
                     <top>
                         <AnchorPane prefHeight="45.0" prefWidth="200.0" styleClass="top-form" BorderPane.alignment="CENTER">
                             <children>
-                                <AnchorPane layoutX="242.0" layoutY="-86.0" prefHeight="35.0" prefWidth="1100.0" styleClass="semi-top-form" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <AnchorPane layoutX="3.0" layoutY="5.0" prefHeight="35.0" prefWidth="1100.0" styleClass="semi-top-form" AnchorPane.bottomAnchor="5.399999999999999" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.3999999999998636" AnchorPane.topAnchor="5.0">
                                     <children>
                                         <Label layoutX="6.0" layoutY="3.0" text="MindPulse">
                                             <font>
@@ -79,6 +79,11 @@
                                     <TableColumn fx:id="column4" prefWidth="531.2000732421875" text="C4" />
                                 </columns>
                               </TableView>
+                              <ImageView fx:id="placeholderImage" fitHeight="533.0" fitWidth="861.0" layoutX="9.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@admin-portal.jpg" />
+                                 </image>
+                              </ImageView>
                                 </children></AnchorPane>
                             </children>
                         </AnchorPane>

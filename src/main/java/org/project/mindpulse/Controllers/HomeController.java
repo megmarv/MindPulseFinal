@@ -24,6 +24,7 @@ public class HomeController extends ArticleHandler {
     @FXML private WebView webview;
     @FXML private Button nextArticleButton;
     @FXML private Label user;
+    @FXML private Button backToLobby;
 
     @FXML private Button sports, entertainment, business, politics, health, education, home; // Category buttons
     @FXML private Button profile, thumbsUp, thumbsDown, visitProfile;
@@ -238,4 +239,16 @@ public class HomeController extends ArticleHandler {
         stage.setScene(scene);
         stage.show();
     }
+
+    @FXML
+    private void redirectToLobby(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/FirstPage.fxml"));
+        Parent MainMenuWindow = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle("MindPulse");
+        Scene scene = new Scene(MainMenuWindow, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+
 }

@@ -58,8 +58,7 @@
                 <TextArea fx:id="email" layoutX="309.0" layoutY="143.0" prefHeight="39.0" prefWidth="211.0" />
                 <TextArea fx:id="username" layoutX="309.0" layoutY="195.0" prefHeight="39.0" prefWidth="211.0" />
                 <TextArea fx:id="password" layoutX="309.0" layoutY="251.0" prefHeight="39.0" prefWidth="211.0" />
-                <Button fx:id="returnHome" onAction="#returnHome" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="93.0" styleClass="login-btn" text="Home" />
-                <Button layoutX="175.0" layoutY="321.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="220.0" styleClass="login-btn" text="Delete Account" />
+                <Button fx:id="returnHome" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#returnHome" prefHeight="30.0" prefWidth="93.0" styleClass="login-btn" text="Home" />
             </children>
         </AnchorPane>
     </children>

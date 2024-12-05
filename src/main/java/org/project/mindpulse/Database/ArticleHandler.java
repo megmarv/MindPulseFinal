@@ -1,5 +1,7 @@
 package org.project.mindpulse.Database;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.project.mindpulse.Controllers.UserController;
 import org.project.mindpulse.CoreModules.Article;
 import org.project.mindpulse.CoreModules.ArticleRecord;
@@ -62,19 +64,16 @@ public class ArticleHandler extends DatabaseHandler {
 
 
     // Refactor of retrieveAllArticles() method to correctly handle the ResultSet and add articles to static list
-    public static void retrieveAllArticles() {
+    public static ObservableList<Article> retrieveAllArticles() {
         System.out.println("Retrieving all articles from the database...");
 
         String query = "SELECT * FROM articles"; // Query to retrieve all articles
+        ObservableList<Article> observableArticleList = FXCollections.observableArrayList();
 
         try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query);
              ResultSet rs = statement.executeQuery()) { // Execute the query
 
-            // Clear the existing list to avoid duplicates
-            Article.articleList.clear();
-
-            // Iterate over the result set and populate the static article list
             while (rs.next()) {
                 int articleId = rs.getInt("articleid");
                 int categoryId = rs.getInt("categoryid");
@@ -83,19 +82,21 @@ public class ArticleHandler extends DatabaseHandler {
                 String content = rs.getString("content");
                 Date dateOfPublish = rs.getDate("dateofpublish");
 
-                // Create a new Article object and add it to the static list
                 Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
-                Article.articleList.add(article); // Add the article to the static list
-
+                observableArticleList.add(article); // Add the article to the observable list
                 System.out.println("Added Article: " + article); // Log each added article
             }
 
-            System.out.println("Total articles retrieved: " + Article.articleList.size()); // Log total number of articles
+            System.out.println("Total articles retrieved: " + observableArticleList.size()); // Log total number of articles
 
         } catch (SQLException e) {
             e.printStackTrace(); // Handle any SQL exceptions
         }
+
+        return observableArticleList; // Return the observable list
     }
+
+
 
     public static List<Article> getArticlesForCategory(int categoryId) {
         List<Article> articles = new ArrayList<>();

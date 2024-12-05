@@ -22,6 +22,7 @@ public class UserController extends UserHandler implements GeneralFeatures{
     @FXML private Button exit;
     @FXML private Button goToRegistration;
     @FXML private Button goToLogin;
+    @FXML private Button backToLobby;
 
     @FXML private TextField usernameForLogin;
     @FXML private PasswordField passwordForLogin;
@@ -177,6 +178,11 @@ public class UserController extends UserHandler implements GeneralFeatures{
     @FXML
     private void redirectToLogInPage(ActionEvent event) throws IOException {
         loadScene(event,"/org/project/mindpulse/UserLogin.fxml","Login",600,400);
+    }
+
+    @FXML
+    private void backToLobby(ActionEvent event) throws IOException {
+        loadScene(event,"/org/project/mindpulse/FirstPage.fxml","MindPulse",600,400);
     }
 
     public void loadScene(ActionEvent event, String fxmlPath, String title, int width, int height) throws IOException {

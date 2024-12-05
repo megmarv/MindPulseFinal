@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.project.mindpulse.CoreModules.Article;
 import org.project.mindpulse.CoreModules.Category;
@@ -50,15 +51,26 @@ public class AdminPageController implements GeneralFeatures {
 
     @FXML private Button goTofetchArticles;
 
+    @FXML private ImageView placeholderImage;
+
     @FXML
     public void initialize() {
 
+        toggleTableView(false);
+        deleteButton.setVisible(false);
         ArticleHandler.retrieveAllArticles();
         // Load data from the database
         articles = Article.articleList;
         users = AdminHandler.getAllUsers();
 
     }
+
+    private void toggleTableView(boolean showTable) {
+        placeholderImage.setVisible(!showTable);
+        sharedTable.setVisible(showTable);
+        deleteButton.setVisible(true);
+    }
+
 
     // Helper method to configure the TableView for users
     private void configureTableForUsers() {
@@ -104,15 +116,18 @@ public class AdminPageController implements GeneralFeatures {
 
     @FXML
     public void viewUsers(ActionEvent event) {
+        users = FXCollections.observableArrayList(AdminHandler.getAllUsers()); // Reload users from DB
         configureTableForUsers();
-        sharedTable.refresh();
+        toggleTableView(true);
     }
 
     @FXML
     public void viewArticles(ActionEvent event) {
+        articles = FXCollections.observableArrayList(ArticleHandler.retrieveAllArticles()); // Reload articles from DB
         configureTableForArticles();
-        sharedTable.refresh();
+        toggleTableView(true);
     }
+
 
     @FXML
     public void displayConfirmation(String message) {
@@ -145,11 +160,18 @@ public class AdminPageController implements GeneralFeatures {
                     User selectedUser = (User) selectedItem;
                     AdminHandler.deleteUser(selectedUser.getUserId());
                     users.remove(selectedUser);
+
+                    // Refresh the TableView
+                    configureTableForUsers();
                 } else if (selectedItem instanceof Article) {
                     Article selectedArticle = (Article) selectedItem;
                     AdminHandler.deleteArticle(selectedArticle.getArticleId());
                     articles.remove(selectedArticle);
+
+                    // Refresh the TableView
+                    configureTableForArticles();
                 }
+
                 displayConfirmation("Item deleted successfully!");
             }
         } else {
