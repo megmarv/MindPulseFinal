@@ -60,7 +60,7 @@
                                                 <Image url="@userimage.png" />
                                             </image>
                                         </ImageView>
-                                        <Button fx:id="profile" layoutX="46.0" layoutY="478.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="94.0" styleClass="logout" text="Profile" />
+                                        <Button fx:id="visitProfile" onAction="#redirectToProfile" layoutX="46.0" layoutY="478.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="94.0" styleClass="logout" text="Profile" />
                                     </children></AnchorPane>
                             </children>
                         </AnchorPane>

@@ -2,13 +2,19 @@ package org.project.mindpulse.Controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import org.project.mindpulse.CoreModules.*;
 import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Service.RecommendationEngine;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +46,21 @@ public class HomeController extends ArticleHandler{
 
     @FXML
     public void initialize() {
+        // Set the default header
+        contentHeader.setText("Recommended For You");
+
+        // Check if a user is logged in
+        User loggedInUser = UserController.getLoggedInUser();
+        if (loggedInUser != null) {
+            // Load and display recommended articles for the logged-in user
+            filterRecommendedArticles();
+        } else {
+            // Handle case when no user is logged in (optional)
+            System.out.println("No user logged in, Unable to load recommended articles");
+            webview.getEngine().loadContent("<html><body><p>Error Loading Content --> UserException </p></body></html>");
+        }
     }
+
 
     public void updateUserLabel(String userName) {
         user.setText(userName);
@@ -220,6 +240,19 @@ public class HomeController extends ArticleHandler{
     @FXML
     public void dislikedArticle(ActionEvent event) {
         thumbsUp.setDisable(true);
+    }
+
+    @FXML private Button visitProfile;
+
+    @FXML
+    private void redirectToProfile(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/UserProfile.fxml"));
+        Parent MainMenuWindow = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle("My Profile");
+        Scene scene = new Scene(MainMenuWindow, 798, 450);
+        stage.setScene(scene);
+        stage.show();
     }
 
 }

@@ -83,7 +83,7 @@ public class UserHandler {
     }
 
 
-    public User getUserDetails(String username) {
+    public static User getUserDetails(String username) {
         // SQL query to fetch user details based on the username
         String query = "SELECT * FROM Users WHERE username = ?";
         User user = null;

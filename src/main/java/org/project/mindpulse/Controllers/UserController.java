@@ -51,6 +51,10 @@ public class UserController extends UserHandler implements GeneralFeatures{
         String username = this.usernameForLogin.getText();
         String password = this.passwordForLogin.getText();
 
+        if(username.isEmpty() || password.isEmpty()) {
+            displayError("username or password cannot be empty ! ");
+        }
+
         if (userExists(username)) {  // Check if the user exists
             if (passwordCorrect(username, password)) {  // Check if the password is correct
                 displayConfirmation("You have successfully logged in!");
@@ -101,7 +105,7 @@ public class UserController extends UserHandler implements GeneralFeatures{
 
         // Check if user already exists
         if (userExists(username)) {
-            displayError("User already exists, please try again");
+            displayError("This username is already taken, please try something else! ");
             return;
         }
 
