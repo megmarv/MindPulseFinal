@@ -11,44 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArticleHandler {
-
-    private static final String URL = "jdbc:postgresql://localhost:5432/MindPulse";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "aaqib2004";
-
-    public static void insertArticle(Article article) {
-        String query = "INSERT INTO Articles (articleId, categoryId, title, authorName, dateOfPublish, content) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setInt(1, article.getArticleId());
-            statement.setInt(2, article.getCategoryId());
-            statement.setString(3, article.getTitle());
-            statement.setString(4, article.getAuthorName());
-            statement.setDate(5, article.getDateOfPublish());
-            statement.setString(6, article.getContent());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static int getCategoryIdByName(String categoryName) {
-        String query = "SELECT categoryid FROM Categories WHERE LOWER(categoryname) = LOWER(?)";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, categoryName);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("categoryid");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1; // Invalid category
-    }
-
+public class ArticleHandler extends DatabaseHandler {
 
     // Method to save an article interaction into the database
     public void saveInteractionToDatabase(ArticleRecord interaction) {
@@ -57,7 +20,7 @@ public class ArticleHandler {
         VALUES (?, ?, ?, ?, ?::interval)
     """;
 
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setInt(1, interaction.getArticleID());
@@ -85,13 +48,22 @@ public class ArticleHandler {
         return null;
     }
 
+    public static int getCategoryIdByName(String name) {
+        for (Category category : Category.getCategories()) {
+            if (category.getCategoryName().equals(name)) {
+                return category.getCategoryID();
+            }
+        }
+        return -1;
+    }
+
     // Refactor of retrieveAllArticles() method to correctly handle the ResultSet and add articles to static list
     public static void retrieveAllArticles() {
         System.out.println("Retrieving all articles from the database...");
 
         String query = "SELECT * FROM articles"; // Query to retrieve all articles
 
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query);
              ResultSet rs = statement.executeQuery()) { // Execute the query
 
@@ -121,51 +93,92 @@ public class ArticleHandler {
         }
     }
 
-    public static void deleteArticle(int articleId) {
-        String query = "DELETE FROM articles WHERE articleid = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+    public static List<Article> getArticlesForCategory(int categoryId) {
+        List<Article> articles = new ArrayList<>();
+        String query = "SELECT * FROM Articles WHERE CategoryID = ?";
+
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, articleId);
-            int rowsAffected = statement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Article deleted successfully.");
+
+            statement.setInt(1, categoryId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int articleId = resultSet.getInt("ArticleID");
+                String title = resultSet.getString("Title");
+                String authorName = resultSet.getString("AuthorName");
+                String content = resultSet.getString("Content");
+                Date dateOfPublish = resultSet.getDate("DateOfPublish");
+
+                // Create an Article object and add it to the list
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
+                articles.add(article);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching articles for category ID " + categoryId + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return articles;
+    }
+
+    // Method to populate user history
+    public static void populateUserHistory(User user) {
+        String query = "SELECT * FROM ArticleInteractions WHERE userId = ?";
+        try (Connection connection = connect();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, user.getUserId());
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int interactionId = resultSet.getInt("interactionId");
+                int articleId = resultSet.getInt("articleId");
+                int categoryId = resultSet.getInt("categoryId");
+                boolean liked = resultSet.getString("rating").equalsIgnoreCase("like");
+                boolean disliked = resultSet.getString("rating").equalsIgnoreCase("dislike");
+                String timeTaken = resultSet.getString("timeTaken");
+
+                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, user.getUserId(), liked, disliked, timeTaken);
+                user.addArticleRecord(record);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void saveArticleToDatabase(Article article) {
-        String checkQuery = "SELECT COUNT(*) FROM Articles WHERE Title = ? AND Content = ?";
-        String insertQuery = "INSERT INTO Articles (Categoryid, Title, AuthorName, DateOfPublish, Content) VALUES (?, ?, ?, ?, ?)";
+    // Method to return a list of Article objects for the Recommendation Engine
+    public static List<Article> getUserArticlesForRecommendation(User user) {
+        List<Article> userArticles = new ArrayList<>();
+        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish " +
+                "FROM ArticleInteractions ai " +
+                "JOIN Articles a ON ai.articleId = a.articleId " +
+                "WHERE ai.userId = ? AND a.role = 'user'";
 
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            // Check for duplicates
-            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
-                checkStmt.setString(1, article.getTitle());
-                checkStmt.setString(2, article.getContent());
-                ResultSet resultSet = checkStmt.executeQuery();
+        try (Connection connection = connect();
+             PreparedStatement statement = connection.prepareStatement(query)) {
 
-                if (resultSet.next() && resultSet.getInt(1) > 0) {
-                    System.out.println("Duplicate article found: " + article.getTitle());
-                    return;
-                }
-            }
+            statement.setInt(1, user.getUserId());
+            ResultSet resultSet = statement.executeQuery();
 
-            // Insert article
-            try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
-                insertStmt.setInt(1, article.getCategoryId());
-                insertStmt.setString(2, article.getTitle());
-                insertStmt.setString(3, article.getAuthorName());
-                insertStmt.setDate(4, article.getDateOfPublish());
-                insertStmt.setString(5, article.getContent());
-                insertStmt.executeUpdate();
-                System.out.println("Article inserted: " + article.getTitle());
+            while (resultSet.next()) {
+                int articleId = resultSet.getInt("articleId");
+                int categoryId = resultSet.getInt("categoryId");
+                String title = resultSet.getString("title");
+                String authorName = resultSet.getString("authorName");
+                String content = resultSet.getString("content");
+                Date dateOfPublish = resultSet.getDate("dateOfPublish");
+
+                // Create an Article object with the retrieved data
+                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
+
+                // Add the Article object to the list
+                userArticles.add(article);
             }
         } catch (SQLException e) {
-            System.err.println("Error saving article to the database: " + e.getMessage());
             e.printStackTrace();
         }
+
+        return userArticles;
     }
 
 

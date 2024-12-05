@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import org.project.mindpulse.CoreModules.Article;
 import org.project.mindpulse.CoreModules.Category;
 import org.project.mindpulse.CoreModules.User;
+import org.project.mindpulse.Database.AdminHandler;
 import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Database.UserHandler;
 
@@ -55,7 +56,7 @@ public class AdminPageController implements GeneralFeatures {
         ArticleHandler.retrieveAllArticles();
         // Load data from the database
         articles = Article.articleList;
-        users = UserHandler.getAllUsers();
+        users = AdminHandler.getAllUsers();
 
     }
 
@@ -132,23 +133,6 @@ public class AdminPageController implements GeneralFeatures {
     }
 
     @FXML
-    public void Exit(ActionEvent exit) {
-        Platform.exit();
-    }
-
-    @FXML
-    private void backToMain(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/FirstPage.fxml"));
-        Parent mainMenuWindow = loader.load();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("MindPulse");
-        Scene scene = new Scene(mainMenuWindow, 600, 400);
-        stage.setScene(scene);
-        stage.show();
-
-    }
-
-    @FXML
     public void handleDelete(ActionEvent event) {
         Object selectedItem = sharedTable.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
@@ -159,11 +143,11 @@ public class AdminPageController implements GeneralFeatures {
             if (confirmationAlert.getResult() == ButtonType.YES) {
                 if (selectedItem instanceof User) {
                     User selectedUser = (User) selectedItem;
-                    UserHandler.deleteUser(selectedUser.getUserId());
+                    AdminHandler.deleteUser(selectedUser.getUserId());
                     users.remove(selectedUser);
                 } else if (selectedItem instanceof Article) {
                     Article selectedArticle = (Article) selectedItem;
-                    ArticleHandler.deleteArticle(selectedArticle.getArticleId());
+                    AdminHandler.deleteArticle(selectedArticle.getArticleId());
                     articles.remove(selectedArticle);
                 }
                 displayConfirmation("Item deleted successfully!");
@@ -175,14 +159,24 @@ public class AdminPageController implements GeneralFeatures {
 
     @FXML
     private void redirectToFetchingArticles(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/AddNewArticle.fxml"));
-        Parent mainMenuWindow = loader.load();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("Admin Portal");
-        Scene scene = new Scene(mainMenuWindow, 1100, 600);
-        stage.setScene(scene);
-        stage.show();
+        loadScene(event,"/org/project/mindpulse/AddNewArticle.fxml","Admin Portal",1100,600);
+    }
 
+    @FXML
+    private void backToMain(ActionEvent event) throws IOException {
+        loadScene(event,"/org/project/mindpulse/FirstPage.fxml","MindPulse",600,400);
+    }
+
+    @FXML
+    public void Exit(ActionEvent exit) { Platform.exit(); }
+
+    public void loadScene(ActionEvent event, String fxmlPath, String title, int width, int height) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        Parent window = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle(title);
+        stage.setScene(new Scene(window, width, height));
+        stage.show();
     }
 
 }

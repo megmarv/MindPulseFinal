@@ -27,19 +27,6 @@ public class Article {
         this.articleHistory = new ArrayList<>();
     }
 
-    // Set the associated Category object based on categoryId for aggregation pointer
-    public void setCategory(Category category) {
-        if (category.getCategoryID() == this.categoryId) {
-            this.category = category;
-        } else {
-            throw new IllegalArgumentException("Category ID mismatch");
-        }
-    }
-
-    public void addArticleRecord(ArticleRecord record) {
-        articleHistory.add(record);
-    }
-
     public List<ArticleRecord> getArticleHistory() {
         return articleHistory;
     }
@@ -90,6 +77,19 @@ public class Article {
 
     public void setDateOfPublish(Date dateOfPublish) {
         this.dateOfPublish = dateOfPublish;
+    }
+
+    // Set the associated Category object based on categoryId for aggregation pointer
+    public void setCategory(Category category) {
+        if (category.getCategoryID() == this.categoryId) {
+            this.category = category;
+        } else {
+            throw new IllegalArgumentException("Category ID mismatch");
+        }
+    }
+
+    public void addArticleRecord(ArticleRecord record) {
+        articleHistory.add(record);
     }
 
     public Category getCategory() {

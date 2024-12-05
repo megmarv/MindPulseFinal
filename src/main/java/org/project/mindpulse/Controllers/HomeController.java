@@ -140,38 +140,32 @@ public class HomeController extends ArticleHandler{
     public void filterArticlesByCategory(int categoryId) {
         currentArticles.clear();
 
-        // Find the corresponding category
-        Category category = findCategoryById(categoryId);
+        // Fetch articles for the category
+        List<Article> categoryArticles = ArticleHandler.getArticlesForCategory(categoryId);
 
-        if (category != null) {
-            // Populate articles for this category
-            category.populateArticlesForThisCategory();
-            List<Article> categoryArticles = category.getArticlesForThisCategory();
+        // Filter out articles already viewed by the user
+        User loggedInUser = UserController.getLoggedInUser();
+        if (loggedInUser != null) {
+            categoryArticles.removeIf(article -> loggedInUser.hasInteractedWithArticle(article.getArticleId()));
+        }
 
-            // Filter out articles already viewed by the user
-            User loggedInUser = UserController.getLoggedInUser();
-            if (loggedInUser != null) {
-                categoryArticles = filterOutViewedArticles(loggedInUser, categoryArticles);
-            }
+        currentArticles.addAll(categoryArticles);
 
-            currentArticles.addAll(categoryArticles);
-
-            if (currentArticles.isEmpty()) {
-                contentHeader.setText("No articles found for this category.");
-                webview.getEngine().loadContent("<html><body><p>No content available</p></body></html>");
-                System.out.println("No articles found for category ID: " + categoryId);
-            } else {
-                contentHeader.setText(category.getCategoryName());
-                System.out.println("Articles loaded for category: " + category.getCategoryName());
-
-                // Display the first article in the category
-                currentArticleIndex = 0;
-                displayArticle(currentArticles.get(currentArticleIndex));
-            }
+        if (currentArticles.isEmpty()) {
+            contentHeader.setText("No articles found for this category.");
+            webview.getEngine().loadContent("<html><body><p>No content available</p></body></html>");
+            System.out.println("No articles found for category ID: " + categoryId);
         } else {
-            System.out.println("Category with ID " + categoryId + " not found.");
+            Category category = ArticleHandler.findCategoryById(categoryId);
+            contentHeader.setText(category != null ? category.getCategoryName() : "Category");
+            System.out.println("Articles loaded for category ID: " + categoryId);
+
+            // Display the first article in the category
+            currentArticleIndex = 0;
+            displayArticle(currentArticles.get(currentArticleIndex));
         }
     }
+
 
 
     @FXML

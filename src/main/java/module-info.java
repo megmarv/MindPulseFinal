@@ -1,6 +1,5 @@
 module org.project.mindpulse {
     requires javafx.fxml;
-    requires com.google.gson;
     requires java.sql;
     requires jdk.compiler;
     requires javafx.web;
@@ -9,7 +8,6 @@ module org.project.mindpulse {
     requires java.desktop;
     requires org.apache.commons.text;
     requires javafx.controls;
-    requires okhttp3;
     requires com.fasterxml.jackson.annotation;
 
     opens org.project.mindpulse.Controllers to javafx.fxml;

@@ -20,7 +20,6 @@ import java.io.IOException;
 
 public class AdminLoginController extends AdminHandler implements GeneralFeatures {
 
-    @FXML private TextField username;
     @FXML private PasswordField password;
 
     @FXML private Button loginButton;
@@ -29,20 +28,16 @@ public class AdminLoginController extends AdminHandler implements GeneralFeature
 
     @FXML
     public void login(ActionEvent event) throws IOException {
-        String username = this.username.getText();
         String password = this.password.getText();
 
-        if (adminExists(username)) {  // Check if the user exists
-            if (passwordCorrect(username, password)) {  // Check if the password is correct
-                displayConfirmation("Welcome back, Admin!");
-                redirectToAdminPortal(event);
-            } else {
-                displayError("Password is incorrect, please try again.");
-            }
+        if (isAdminPasswordCorrect(password)) { // Directly check if the password is correct
+            displayConfirmation("Welcome back, Admin!");
+            redirectToAdminPortal(event);
         } else {
-            displayError("Admin does not exist ! please try again !");
+            displayError("Password is incorrect, please try again.");
         }
     }
+
 
     @FXML
     public void displayConfirmation(String message) {
@@ -63,34 +58,25 @@ public class AdminLoginController extends AdminHandler implements GeneralFeature
     }
 
     @FXML
-    public void Exit(ActionEvent exit) throws IOException {
-
-        Platform.exit();
-
-    }
+    public void Exit(ActionEvent exit) throws IOException { Platform.exit(); }
 
     @FXML
     private void redirectToAdminPortal(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/AdminPage.fxml"));
-        Parent mainMenuWindow = loader.load();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("Admin Portal");
-        Scene scene = new Scene(mainMenuWindow, 1100, 600);
-        stage.setScene(scene);
-        stage.show();
-
+        loadScene(event,"/org/project/mindpulse/AdminPage.fxml","Admin Portal",1100,600);
     }
 
     @FXML
     private void backToMain(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/FirstPage.fxml"));
-        Parent mainMenuWindow = loader.load();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("MindPulse");
-        Scene scene = new Scene(mainMenuWindow, 600, 400);
-        stage.setScene(scene);
-        stage.show();
+        loadScene(event,"/org/project/mindpulse/AdminPage.fxml","MindPulse",600,400);
+    }
 
+    public void loadScene(ActionEvent event, String fxmlPath, String title, int width, int height) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        Parent window = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setTitle(title);
+        stage.setScene(new Scene(window, width, height));
+        stage.show();
     }
 
 }

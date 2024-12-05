@@ -1,5 +1,6 @@
 package org.project.mindpulse.Controllers;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,13 +10,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.project.mindpulse.CoreModules.Article;
+import org.project.mindpulse.Database.AdminHandler;
 import org.project.mindpulse.Database.ArticleHandler;
 
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 
-public class AddNewArticleController {
+public class AddNewArticleController implements GeneralFeatures{
 
     @FXML private Button addNewArticleButton;
     @FXML private Button manageUsers;
@@ -37,20 +39,20 @@ public class AddNewArticleController {
 
         // Input validation
         if (title.isEmpty() || author.isEmpty() || content.isEmpty() || date == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields are required.");
+            displayError("Error, All fields are required");
             return;
         }
 
         // Assign category
         String category = assignCategory(content);
         if (category == null) {
-            showAlert(Alert.AlertType.ERROR, "Category Error", "Unable to determine the article category.");
+            displayError("Unable to determine the article category.");
             return;
         }
 
         int categoryId = ArticleHandler.getCategoryIdByName(category);
         if (categoryId == -1) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Invalid category: " + category);
+            displayError("Invalid category: " + category);
             return;
         }
 
@@ -66,11 +68,11 @@ public class AddNewArticleController {
 
         // Save to database
         try {
-            ArticleHandler.saveArticleToDatabase(article);
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Article added successfully.");
+            AdminHandler.saveArticleToDatabase(article);
+            displayConfirmation("Article added successfully.");
             clearFields();
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to save article: " + e.getMessage());
+            displayError("Database Error, Failed to save article: " + e.getMessage());
         }
     }
 
@@ -108,9 +110,20 @@ public class AddNewArticleController {
         return false;
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
+    @FXML
+    public void displayConfirmation(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    @FXML
+    public void displayError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
@@ -125,7 +138,7 @@ public class AddNewArticleController {
         loadScene(event, "/org/project/mindpulse/FirstPage.fxml", "MindPulse", 600, 400);
     }
 
-    private void loadScene(ActionEvent event, String fxmlPath, String title, int width, int height) throws IOException {
+    public void loadScene(ActionEvent event, String fxmlPath, String title, int width, int height) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         Parent window = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -133,4 +146,7 @@ public class AddNewArticleController {
         stage.setScene(new Scene(window, width, height));
         stage.show();
     }
+
+    public void Exit(ActionEvent event){ Platform.exit();}
+
 }

@@ -24,7 +24,7 @@ public class FirstPageController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/UserLogin.fxml"));
         Parent MainMenuWindow1 = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("Sign in");
+        stage.setTitle("User Login");
         Scene scene = new Scene(MainMenuWindow1, 600, 400);
         stage.setScene(scene);
         stage.show();
@@ -35,17 +35,13 @@ public class FirstPageController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/AdminLogin.fxml"));
         Parent MainMenuWindow2 = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("Sign in");
+        stage.setTitle("Admin Login");
         Scene scene = new Scene(MainMenuWindow2, 600, 400);
         stage.setScene(scene);
         stage.show();
     }
 
     @FXML
-    public void Exit(ActionEvent exit) throws IOException {
-
-        Platform.exit();
-
-    }
+    public void Exit(ActionEvent exit) throws IOException {Platform.exit();}
 
 }

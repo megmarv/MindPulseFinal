@@ -1,5 +1,6 @@
 package org.project.mindpulse.Database;
 
+import javafx.scene.chart.PieChart;
 import org.project.mindpulse.CoreModules.Article;
 import org.project.mindpulse.CoreModules.ArticleRecord;
 import org.project.mindpulse.CoreModules.User;
@@ -9,34 +10,30 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserHandler {
+public class UserHandler extends DatabaseHandler {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/MindPulse";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "aaqib2004";
-
-    // method to check if a user exists for a given username
+    // Method to check if a user exists for a given username
     public boolean userExists(String username) {
-        String query = "SELECT COUNT(*) FROM Users WHERE username = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        String query = "SELECT COUNT(*) FROM Users WHERE username = ? AND role = 'user'";
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getInt(1) > 0; // Return true if at least one user exists with the given username
+                return resultSet.getInt(1) > 0; // Return true if a user with role 'user' exists
             }
         } catch (SQLException e) {
+            System.err.println("Error checking if user exists for username " + username + ": " + e.getMessage());
             e.printStackTrace();
         }
         return false; // Return false if user does not exist or an error occurs
     }
 
-
-    // method to check if the password is correct for a given username
+    // Method to check if the password is correct for a given username
     public boolean passwordCorrect(String username, String password) {
-        String query = "SELECT password FROM Users WHERE username = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        String query = "SELECT password FROM Users WHERE username = ? AND role = 'user'";
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setString(1, username);
@@ -46,15 +43,16 @@ public class UserHandler {
                 return storedPassword.equals(password); // Check if the stored password matches the provided password
             }
         } catch (SQLException e) {
+            System.err.println("Error checking password for username " + username + ": " + e.getMessage());
             e.printStackTrace();
         }
         return false; // Return false if the password does not match or an error occurs
     }
 
-    // method to create a new user in the database
+    // Method to create a new user in the database
     public boolean createUser(String name, String email, String username, String password) {
-        String query = "INSERT INTO Users (name, email, username, password) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        String query = "INSERT INTO Users (name, email, username, password, role) VALUES (?, ?, ?, ?, 'user')";
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setString(1, name);
@@ -64,140 +62,55 @@ public class UserHandler {
             int rowsInserted = statement.executeUpdate();
             return rowsInserted > 0; // Return true if the user was successfully created
         } catch (SQLException e) {
+            System.err.println("Error creating user with username " + username + ": " + e.getMessage());
             e.printStackTrace();
         }
         return false; // Return false if an error occurs
     }
 
-    public static void deleteUser(int userId) {
-        String query = "DELETE FROM users WHERE userid = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, userId);
-            int rowsAffected = statement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("User deleted successfully.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
+    // Method to get user details based on the username
     public static User getUserDetails(String username) {
-        // SQL query to fetch user details based on the username
-        String query = "SELECT * FROM Users WHERE username = ?";
+        String query = "SELECT * FROM Users WHERE username = ? AND role = 'user'";
         User user = null;
 
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            // Set the username parameter in the query
             statement.setString(1, username);
-
-            // Execute the query
             ResultSet resultSet = statement.executeQuery();
 
-            // If the result set contains a row, map the result to a User object
             if (resultSet.next()) {
                 int userId = resultSet.getInt("userId");
                 String name = resultSet.getString("name");
                 String email = resultSet.getString("email");
-                String password = resultSet.getString("password"); // Ideally, this should be hashed
+                String password = resultSet.getString("password");
 
                 // Create a User object with the retrieved details
                 user = new User(userId, name, email, username, password);
             }
-
         } catch (SQLException e) {
+            System.err.println("Error retrieving user details for username " + username + ": " + e.getMessage());
             e.printStackTrace();
         }
 
         return user;
     }
 
-    // Method to populate user history
-    public static void populateUserHistory(User user) {
-        String query = "SELECT * FROM ArticleInteractions WHERE userId = ?";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setInt(1, user.getUserId());
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                int interactionId = resultSet.getInt("interactionId");
-                int articleId = resultSet.getInt("articleId");
-                int categoryId = resultSet.getInt("categoryId");
-                boolean liked = resultSet.getString("rating").equalsIgnoreCase("like");
-                boolean disliked = resultSet.getString("rating").equalsIgnoreCase("dislike");
-                String timeTaken = resultSet.getString("timeTaken");
-
-                ArticleRecord record = new ArticleRecord(interactionId, articleId, categoryId, user.getUserId(), liked, disliked, timeTaken);
-                user.addArticleRecord(record);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to return a list of Article objects for the Recommendation Engine
-    public static List<Article> getUserArticlesForRecommendation(User user) {
-        List<Article> userArticles = new ArrayList<>();
-        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish " +
-                "FROM ArticleInteractions ai " +
-                "JOIN Articles a ON ai.articleId = a.articleId " +
-                "WHERE ai.userId = ?";
-
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setInt(1, user.getUserId());
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                int articleId = resultSet.getInt("articleId");
-                int categoryId = resultSet.getInt("categoryId");
-                String title = resultSet.getString("title");
-                String authorName = resultSet.getString("authorName");
-                String content = resultSet.getString("content");
-                Date dateOfPublish = resultSet.getDate("dateOfPublish");
-
-                // Create an Article object with the retrieved data
-                Article article = new Article(articleId, categoryId, title, authorName, content, dateOfPublish);
-
-                // Add the Article object to the list
-                userArticles.add(article);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return userArticles;
-    }
-
-
     // Method to populate all user preferences
     public static List<UserPreference> getUserPreferences(User user) {
         List<UserPreference> userPreferences = new ArrayList<>();
-
-        // SQL query to retrieve user preferences
         String query = """
-            SELECT CategoryID, Likes, Dislikes, NullInteractions, TimeSpent, NormalizedScore
-            FROM UserPreferences
-            WHERE UserID = ?;
-        """;
+        SELECT CategoryID, Likes, Dislikes, NullInteractions, TimeSpent, NormalizedScore
+        FROM UserPreferences
+        WHERE UserID = ?;
+    """;
 
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            // Set the user ID in the query
             statement.setInt(1, user.getUserId());
-
-            // Execute the query
             ResultSet resultSet = statement.executeQuery();
 
-            // Iterate through the result set and create UserPreference objects
             while (resultSet.next()) {
                 int categoryId = resultSet.getInt("CategoryID");
                 int likes = resultSet.getInt("Likes");
@@ -207,63 +120,13 @@ public class UserHandler {
                 double totalScore = resultSet.getDouble("NormalizedScore");
 
                 // Create a UserPreference object and add it to the list
-                UserPreference preference = new UserPreference(categoryId, likes, dislikes, nullInteractions, timeSpent, totalScore);
-                userPreferences.add(preference);
+                userPreferences.add(new UserPreference(categoryId, likes, dislikes, nullInteractions, timeSpent, totalScore));
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving user preferences: " + e.getMessage());
+            System.err.println("Error retrieving user preferences for user ID " + user.getUserId() + ": " + e.getMessage());
             e.printStackTrace();
         }
 
         return userPreferences;
     }
-
-
-
-
-
-    // Helper method to parse HH:mm:ss to milliseconds
-    private static long parseTimeTakenToMillis(String timeTaken) {
-        try {
-            String[] parts = timeTaken.split(":");
-            int hours = Integer.parseInt(parts[0]);
-            int minutes = Integer.parseInt(parts[1]);
-            int seconds = Integer.parseInt(parts[2]);
-
-            return (hours * 3600 + minutes * 60 + seconds) * 1000L;
-        } catch (Exception e) {
-            System.err.println("Error parsing timeTaken: " + timeTaken);
-            e.printStackTrace();
-            return 0L; // Default to 0 if parsing fails
-        }
-    }
-
-    public static List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM Users";
-
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-
-            while (rs.next()) {
-                int userID = rs.getInt("UserID");
-                String name = rs.getString("name");
-                String email = rs.getString("email");
-                String username = rs.getString("username");
-                String password = rs.getString("password");
-
-                users.add(new User(userID, name, email, username, password));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error fetching users: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return users;
-    }
-
-
-
-
 }

@@ -27,15 +27,10 @@ public class RecommendationEngine {
         System.out.println("Top category for recommendation: " + topCategoryId);
 
         // Step 3: Fetch articles for the top category
-        List<Article> categoryArticles = new ArrayList<>(); // Declare outside the block
-        Category topCategory = ArticleHandler.findCategoryById(topCategoryId);
-        if (topCategory != null) {
-            topCategory.populateArticlesForThisCategory();
-            categoryArticles = topCategory.getArticlesForThisCategory();
-        }
+        List<Article> categoryArticles = ArticleHandler.getArticlesForCategory(topCategoryId);
 
         // Step 4: Fetch user's article history
-        List<Article> userHistory = UserHandler.getUserArticlesForRecommendation(user);
+        List<Article> userHistory = ArticleHandler.getUserArticlesForRecommendation(user);
 
         // Step 5: Compute similarity and skip already interacted articles
         Map<Article, Double> similarityMap = new HashMap<>();
@@ -65,6 +60,7 @@ public class RecommendationEngine {
 
         return sortedRecommendations;
     }
+
 
 
     private static double findSimilarity(Article article1, Article article2) {

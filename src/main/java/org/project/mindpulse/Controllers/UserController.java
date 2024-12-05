@@ -1,17 +1,16 @@
 package org.project.mindpulse.Controllers;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.project.mindpulse.CoreModules.User;
+import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Database.UserHandler;
 
 import java.io.IOException;
@@ -160,29 +159,26 @@ public class UserController extends UserHandler implements GeneralFeatures{
         stage.setScene(scene);
         stage.show();
 
-        UserController.populateUserHistory(loggedInUser);
+        ArticleHandler.populateUserHistory(loggedInUser);
 
     }
 
     @FXML
     private void redirectToRegistration(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/NewUserAccount.fxml"));
-        Parent MainMenuWindow = loader.load();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("Create Account");
-        Scene scene = new Scene(MainMenuWindow, 600, 400);
-        stage.setScene(scene);
-        stage.show();
+        loadScene(event,"/org/project/mindpulse/NewUserAccount.fxml","Register",600,400);
     }
 
     @FXML
     private void redirectToLogInPage(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/UserLogin.fxml"));
-        Parent MainMenuWindow = loader.load();
+        loadScene(event,"/org/project/mindpulse/UserLogin.fxml","Login",600,400);
+    }
+
+    public void loadScene(ActionEvent event, String fxmlPath, String title, int width, int height) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        Parent window = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setTitle("Sign in");
-        Scene scene = new Scene(MainMenuWindow, 600, 400);
-        stage.setScene(scene);
+        stage.setTitle(title);
+        stage.setScene(new Scene(window, width, height));
         stage.show();
     }
 

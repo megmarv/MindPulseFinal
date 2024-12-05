@@ -13,11 +13,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import org.project.mindpulse.CoreModules.User;
+import org.project.mindpulse.Database.ArticleHandler;
 import org.project.mindpulse.Database.UserHandler;
 
 import java.io.IOException;
 
-public class UserProfileController implements GeneralFeatures {
+public class UserProfileController {
 
     @FXML private TextArea name;
     @FXML private TextArea email;
@@ -39,29 +40,7 @@ public class UserProfileController implements GeneralFeatures {
     }
 
     @FXML
-    public void displayConfirmation(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    @FXML
-    public void displayError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    @FXML
-    public void Exit(ActionEvent exit) throws IOException {
-
-        Platform.exit();
-
-    }
+    public void Exit(ActionEvent exit) throws IOException { Platform.exit();}
 
     @FXML
     public void returnHome(ActionEvent exit) throws IOException {
@@ -83,7 +62,7 @@ public class UserProfileController implements GeneralFeatures {
         stage.setScene(scene);
         stage.show();
 
-        UserController.populateUserHistory(UserController.getLoggedInUser());
+        ArticleHandler.populateUserHistory(UserController.getLoggedInUser());
 
     }
 
