@@ -36,8 +36,14 @@ public class UserController extends UserHandler implements GeneralFeatures{
 
     // Getter for the logged-in user
     public static User getLoggedInUser() {
+        if (loggedInUser == null) {
+            System.out.println("No user is currently logged in.");
+        } else {
+            System.out.println("Logged in user: " + loggedInUser.getUsername());
+        }
         return loggedInUser;
     }
+
 
     // Method to log out the user
     public static void logoutUser() {
@@ -55,7 +61,7 @@ public class UserController extends UserHandler implements GeneralFeatures{
         }
 
         if (userExists(username)) {  // Check if the user exists
-            if (passwordCorrect(username, password)) {  // Check if the password is correct
+            if (userPasswordCorrect(username,password)) {  // Check if the password is correct
                 displayConfirmation("You have successfully logged in!");
 
                 // Retrieve user details and create a User object

@@ -100,11 +100,11 @@ public class AdminHandler extends DatabaseHandler {
 
     public static List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM Users WHERE role = 'user'"; // Filter to retrieve only users with role 'user'
+        String query = "SELECT * FROM Users WHERE role = 'user'"; // Filter for users with role 'user'
 
         try (Connection connection = connect();
-             Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
                 int userID = rs.getInt("UserID");
@@ -113,8 +113,10 @@ public class AdminHandler extends DatabaseHandler {
                 String username = rs.getString("username");
                 String password = rs.getString("password");
 
-                // Add only users with the role 'user'
-                users.add(new User(userID, name, email, username, password));
+                // Add each user to the list
+                User user = new User(userID, name, username, password);
+                user.setEmail(email); // Set additional property specific to User
+                users.add(user);
             }
         } catch (SQLException e) {
             System.err.println("Error fetching users: " + e.getMessage());
@@ -123,6 +125,7 @@ public class AdminHandler extends DatabaseHandler {
 
         return users;
     }
+
 
 
 }

@@ -49,13 +49,17 @@ public class ArticleHandler extends DatabaseHandler {
     }
 
     public static int getCategoryIdByName(String name) {
+        System.out.println("Searching for category: " + name);
         for (Category category : Category.getCategories()) {
-            if (category.getCategoryName().equals(name)) {
+            if (category.getCategoryName().equalsIgnoreCase(name.trim())) {
+                System.out.println("Found category: " + category.getCategoryName() + " with ID: " + category.getCategoryID());
                 return category.getCategoryID();
             }
         }
+        System.out.println("Category not found: " + name);
         return -1;
     }
+
 
     // Refactor of retrieveAllArticles() method to correctly handle the ResultSet and add articles to static list
     public static void retrieveAllArticles() {
@@ -121,7 +125,6 @@ public class ArticleHandler extends DatabaseHandler {
         return articles;
     }
 
-    // Method to populate user history
     public static void populateUserHistory(User user) {
         String query = "SELECT * FROM ArticleInteractions WHERE userId = ?";
         try (Connection connection = connect();
@@ -146,13 +149,15 @@ public class ArticleHandler extends DatabaseHandler {
         }
     }
 
-    // Method to return a list of Article objects for the Recommendation Engine
+
     public static List<Article> getUserArticlesForRecommendation(User user) {
         List<Article> userArticles = new ArrayList<>();
-        String query = "SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish " +
-                "FROM ArticleInteractions ai " +
-                "JOIN Articles a ON ai.articleId = a.articleId " +
-                "WHERE ai.userId = ? AND a.role = 'user'";
+        String query = """
+        SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish
+        FROM ArticleInteractions ai
+        JOIN Articles a ON ai.articleId = a.articleId
+        WHERE ai.userId = ?
+    """;
 
         try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -175,6 +180,7 @@ public class ArticleHandler extends DatabaseHandler {
                 userArticles.add(article);
             }
         } catch (SQLException e) {
+            System.err.println("Error fetching articles for recommendation: " + e.getMessage());
             e.printStackTrace();
         }
 

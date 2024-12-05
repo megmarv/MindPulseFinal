@@ -1,33 +1,9 @@
 package org.project.mindpulse.CoreModules;
 
-public class Admin {
+public class Admin extends Individual {
 
-    private int adminID;
-    private String adminUserName;
-    private String adminPassword;
-
-    public int getAdminID() {
-        return adminID;
-    }
-
-    public void setAdminID(int adminID) {
-        this.adminID = adminID;
-    }
-
-    public String getAdminUserName() {
-        return adminUserName;
-    }
-
-    public void setAdminUserName(String adminUserName) {
-        this.adminUserName = adminUserName;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
+    public Admin(String password) {
+        super(1,"Aaqib", "Admin", password); // Admin name is predefined
     }
 
 }

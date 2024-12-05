@@ -18,62 +18,43 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeController extends ArticleHandler{
+public class HomeController extends ArticleHandler {
 
     @FXML private Label contentHeader;
     @FXML private WebView webview;
     @FXML private Button nextArticleButton;
-
     @FXML private Label user;
 
-    @FXML private Button sports;
-    @FXML private Button entertainment;
-    @FXML private Button business;
-    @FXML private Button politics;
-    @FXML private Button health;
-    @FXML private Button education;
-    @FXML private Button home; // Added button for Home category
-
-    @FXML private Button profile;
-    @FXML private Button thumbsUp;  // Thumbs Up button
-    @FXML private Button thumbsDown; // Thumbs Down button
+    @FXML private Button sports, entertainment, business, politics, health, education, home; // Category buttons
+    @FXML private Button profile, thumbsUp, thumbsDown, visitProfile;
 
     private List<Article> currentArticles = new ArrayList<>();
-    private int currentArticleIndex = 0; // To track the current article
-
-    private long startTime; // To track the start time for article interactions
-
+    private int currentArticleIndex = 0;
+    private long startTime;
+    private boolean isViewingRecommended = false;
+    private int interactionCount = 0;
 
     @FXML
     public void initialize() {
-        // Set the default header
         contentHeader.setText("Recommended For You");
 
-        // Check if a user is logged in
         User loggedInUser = UserController.getLoggedInUser();
         if (loggedInUser != null) {
-            // Load and display recommended articles for the logged-in user
             filterRecommendedArticles();
         } else {
-            // Handle case when no user is logged in (optional)
             System.out.println("No user logged in, Unable to load recommended articles");
             webview.getEngine().loadContent("<html><body><p>Error Loading Content --> UserException </p></body></html>");
         }
     }
 
-
     public void updateUserLabel(String userName) {
         user.setText(userName);
     }
 
-
-    // Reset thumbs buttons when a new article is displayed
     private void resetThumbsButtons() {
         thumbsUp.setDisable(false);
         thumbsDown.setDisable(false);
     }
-
-    public int interactionCount = 0;
 
     private List<Article> filterOutViewedArticles(User user, List<Article> articles) {
         return articles.stream()
@@ -81,58 +62,52 @@ public class HomeController extends ArticleHandler{
                 .toList();
     }
 
-
     @FXML
     public void nextArticle(ActionEvent event) {
-        if (!currentArticles.isEmpty()) {
-            Article currentArticle = currentArticles.get(currentArticleIndex);
-
-            // Record interaction
-            recordInteraction(currentArticle);
-
-            // Move to the next article
-            do {
-                currentArticleIndex = (currentArticleIndex + 1) % currentArticles.size();
-            } while (UserController.getLoggedInUser().hasInteractedWithArticle(currentArticles.get(currentArticleIndex).getArticleId()));
-
-            displayArticle(currentArticles.get(currentArticleIndex));
-            System.out.println("Moved to next article. Current Index: " + currentArticleIndex);
-        } else {
-            System.out.println("No more articles to display.");
+        if (currentArticles.isEmpty()) {
+            System.out.println("No articles available.");
+            return;
         }
 
+        User loggedInUser = UserController.getLoggedInUser();
+        if (loggedInUser == null) {
+            System.out.println("No user logged in.");
+            return;
+        }
+
+        Article currentArticle = currentArticles.get(currentArticleIndex);
+        recordInteraction(currentArticle);
+
+        int startingIndex = currentArticleIndex;
+        do {
+            currentArticleIndex = (currentArticleIndex + 1) % currentArticles.size();
+            if (currentArticleIndex == startingIndex) {
+                System.out.println("All articles have been viewed.");
+                webview.getEngine().loadContent("<html><body><p>All articles have been viewed.</p></body></html>");
+                return;
+            }
+        } while (loggedInUser.hasInteractedWithArticle(currentArticles.get(currentArticleIndex).getArticleId()));
+
+        displayArticle(currentArticles.get(currentArticleIndex));
         resetThumbsButtons();
     }
-
-
-    private boolean isViewingRecommended = false; // Track if the user is viewing recommended articles
-
-
 
     @FXML
     public void handleCategorySelection(ActionEvent event) {
         Button selectedButton = (Button) event.getSource();
         String categoryText = selectedButton.getText().toLowerCase();
 
-        // Map the button text to category IDs or "recommended" for the Home button
         int categoryId = categoryText.equals("home") ? 0 : getCategoryIdByName(categoryText);
 
-        if (categoryId != -1) {
-            if (categoryId == 0) {
-                isViewingRecommended = true; // Viewing recommended articles
-                filterRecommendedArticles();
-            } else {
-                isViewingRecommended = false; // Viewing articles of a specific category
-                filterArticlesByCategory(categoryId);
-            }
-
-            if (currentArticles.isEmpty()) {
-                contentHeader.setText("No articles found for " + categoryText);
-                webview.getEngine().loadContent("<html><body><p>No content available</p></body></html>");
-            } else {
-                currentArticleIndex = 0; // Reset to the first article
-                displayArticle(currentArticles.get(currentArticleIndex));
-            }
+        if (categoryId == 0) {
+            isViewingRecommended = true;
+            filterRecommendedArticles();
+        } else if (categoryId > 0) {
+            isViewingRecommended = false;
+            filterArticlesByCategory(categoryId);
+        } else {
+            System.out.println("Invalid category selected.");
+            webview.getEngine().loadContent("<html><body><p>Invalid category selected.</p></body></html>");
         }
     }
 
@@ -140,10 +115,8 @@ public class HomeController extends ArticleHandler{
     public void filterArticlesByCategory(int categoryId) {
         currentArticles.clear();
 
-        // Fetch articles for the category
         List<Article> categoryArticles = ArticleHandler.getArticlesForCategory(categoryId);
 
-        // Filter out articles already viewed by the user
         User loggedInUser = UserController.getLoggedInUser();
         if (loggedInUser != null) {
             categoryArticles.removeIf(article -> loggedInUser.hasInteractedWithArticle(article.getArticleId()));
@@ -153,20 +126,17 @@ public class HomeController extends ArticleHandler{
 
         if (currentArticles.isEmpty()) {
             contentHeader.setText("No articles found for this category.");
-            webview.getEngine().loadContent("<html><body><p>No content available</p></body></html>");
+            webview.getEngine().loadContent("<html><body><p>No articles available.</p></body></html>");
             System.out.println("No articles found for category ID: " + categoryId);
         } else {
             Category category = ArticleHandler.findCategoryById(categoryId);
             contentHeader.setText(category != null ? category.getCategoryName() : "Category");
             System.out.println("Articles loaded for category ID: " + categoryId);
 
-            // Display the first article in the category
             currentArticleIndex = 0;
             displayArticle(currentArticles.get(currentArticleIndex));
         }
     }
-
-
 
     @FXML
     public void filterRecommendedArticles() {
@@ -177,11 +147,14 @@ public class HomeController extends ArticleHandler{
             return;
         }
 
-        // Get recommended articles
-        List<Article> recommendedArticles = RecommendationEngine.recommendArticles(loggedInUser);
+        if (loggedInUser.getUserHistory().size() < 5) {
+            System.out.println("User must read at least 5 articles before accessing recommendations.");
+            webview.getEngine().loadContent("<html><body><p>Read at least 5 articles to get personalized recommendations.</p></body></html>");
+            return;
+        }
 
-        // Filter out articles already viewed by the user
-        recommendedArticles = filterOutViewedArticles(loggedInUser, recommendedArticles);
+        List<Article> recommendedArticles = RecommendationEngine.recommendArticles(loggedInUser);
+        recommendedArticles.removeIf(article -> loggedInUser.hasInteractedWithArticle(article.getArticleId()));
 
         currentArticles.clear();
         currentArticles.addAll(recommendedArticles);
@@ -193,14 +166,11 @@ public class HomeController extends ArticleHandler{
             contentHeader.setText("Recommended Articles");
             displayArticle(currentArticles.get(0));
         }
-        currentArticleIndex = 0; // Reset to the first article
+        currentArticleIndex = 0;
     }
-
 
     private void recordInteraction(Article article) {
         long timeTakenMillis = System.currentTimeMillis() - this.startTime;
-        boolean liked = !thumbsUp.isDisable() && thumbsDown.isDisable();
-        boolean disliked = !thumbsDown.isDisable() && thumbsUp.isDisable();
 
         User loggedInUser = UserController.getLoggedInUser();
         if (loggedInUser == null) {
@@ -209,33 +179,27 @@ public class HomeController extends ArticleHandler{
         }
 
         ArticleRecord interaction = new ArticleRecord(
-                0, // Auto-generated in DB
+                0,
                 article.getArticleId(),
                 article.getCategoryId(),
                 loggedInUser.getUserId(),
-                liked,
-                disliked,
+                !thumbsUp.isDisable() && thumbsDown.isDisable(),
+                !thumbsDown.isDisable() && thumbsUp.isDisable(),
                 timeTakenMillis
         );
 
         saveInteractionToDatabase(interaction);
 
-        interactionCount++;
-        if (interactionCount % 5 == 0) {
-            // Refresh recommendations every 5 interactions
-            System.out.println("Refreshing recommendations after 5 interactions.");
-            filterRecommendedArticles();
-        }
+        loggedInUser.addArticleRecord(interaction);
+        System.out.println("Interaction recorded for user: " + loggedInUser.getUsername() + " with article ID: " + article.getArticleId());
     }
-
 
     @FXML
     private void displayArticle(Article article) {
-        this.startTime = System.currentTimeMillis(); // Set the start time when displaying the article
+        this.startTime = System.currentTimeMillis();
 
         String category = article.getCategory() != null ? article.getCategory().getCategoryName() : "Unknown Category";
 
-        // Set the content header
         contentHeader.setText(category);
 
         java.net.URL cssUrl = getClass().getResource("/org/project/mindpulse/articleStyles.css");
@@ -264,8 +228,6 @@ public class HomeController extends ArticleHandler{
         thumbsUp.setDisable(true);
     }
 
-    @FXML private Button visitProfile;
-
     @FXML
     private void redirectToProfile(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/project/mindpulse/UserProfile.fxml"));
@@ -276,5 +238,4 @@ public class HomeController extends ArticleHandler{
         stage.setScene(scene);
         stage.show();
     }
-
 }

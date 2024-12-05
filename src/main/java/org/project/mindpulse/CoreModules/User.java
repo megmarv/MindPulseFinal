@@ -1,30 +1,16 @@
 package org.project.mindpulse.CoreModules;
 
-import org.project.mindpulse.Controllers.UserController;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User extends Individual {
 
-    private int userId;
-    private String name;
     private String email;
-    private String username;
-    private String password;
+    private List<ArticleRecord> userHistory = new ArrayList<>();
+    private List<UserPreference> userPreferences = new ArrayList<>();
 
-    private List<ArticleRecord> userHistory = new ArrayList<>(); // composition between user and ArticleRecord
-    private List<UserPreference> userPreferences = new ArrayList<>(); // composition between user and UserPreference
-
-
-    public User(int userId, String name, String email, String username, String password) {
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.userHistory = new ArrayList<>();
-        this.userPreferences = new ArrayList<>();
+    public User(int userId, String name, String username, String password) {
+        super(userId, name, username, password);
     }
 
     public void addArticleRecord(ArticleRecord articleRecord) {
@@ -41,7 +27,6 @@ public class User {
         return null;
     }
 
-
     public List<UserPreference> getAllPreferences() {
         return userPreferences;
     }
@@ -50,20 +35,8 @@ public class User {
         return userHistory;
     }
 
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setUserHistory(List<ArticleRecord> userHistory) {
+        this.userHistory = userHistory;
     }
 
     public String getEmail() {
@@ -74,35 +47,20 @@ public class User {
         this.email = email;
     }
 
-    public String getUsername() {
-        return username;
+    public List<UserPreference> getUserPreferences() {
+        return userPreferences;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserPreferences(List<UserPreference> userPreferences) {
+        this.userPreferences = userPreferences;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setUserHistory(List<ArticleRecord> userHistory) {
-        this.userHistory = userHistory;
-    }
-
-    public boolean hasInteractedWithArticle(int articleId){
-        for(ArticleRecord articleRecord : userHistory){
-            if(articleRecord.getArticleID() == articleId){
+    public boolean hasInteractedWithArticle(int articleId) {
+        for (ArticleRecord articleRecord : userHistory) {
+            if (articleRecord.getArticleID() == articleId) {
                 return true;
             }
         }
         return false;
     }
-
-
-
 }
