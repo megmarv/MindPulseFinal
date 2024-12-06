@@ -58,9 +58,8 @@ public class AdminPageController implements GeneralFeatures {
 
         toggleTableView(false);
         deleteButton.setVisible(false);
-        ArticleHandler.retrieveAllArticles();
         // Load data from the database
-        articles = Article.articleList;
+        articles = ArticleHandler.getArticlesForTableView();
         users = AdminHandler.getAllUsers();
 
     }
@@ -123,7 +122,7 @@ public class AdminPageController implements GeneralFeatures {
 
     @FXML
     public void viewArticles(ActionEvent event) {
-        articles = FXCollections.observableArrayList(ArticleHandler.retrieveAllArticles()); // Reload articles from DB
+        articles = FXCollections.observableArrayList(ArticleHandler.getArticlesForTableView()); // Reload articles from DB
         configureTableForArticles();
         toggleTableView(true);
     }

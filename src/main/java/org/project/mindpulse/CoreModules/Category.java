@@ -1,8 +1,5 @@
 package org.project.mindpulse.CoreModules;
 
-import org.project.mindpulse.Database.DatabaseHandler;
-
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,4 +44,5 @@ public class Category {
     public String getCategoryName() {
         return categoryName;
     }
+
 }

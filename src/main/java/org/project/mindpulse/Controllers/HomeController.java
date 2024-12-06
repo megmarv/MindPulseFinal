@@ -70,7 +70,7 @@ public class HomeController extends ArticleHandler {
     }
 
     @FXML
-    public void nextArticle(ActionEvent event) {
+    public void moveToNextArticle(ActionEvent event) {
         if (currentArticles.isEmpty()) {
             System.out.println("No articles available.");
             return;

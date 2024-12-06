@@ -18,15 +18,6 @@ public class User extends Individual {
         System.out.println("Added to history: " + articleRecord.toString());
     }
 
-    public UserPreference getPreferenceWithCategoryId(int categoryId) {
-        for (UserPreference pref : userPreferences) {
-            if (pref.getCategoryId() == categoryId) {
-                return pref;
-            }
-        }
-        return null;
-    }
-
     public List<UserPreference> getAllPreferences() {
         return userPreferences;
     }

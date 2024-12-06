@@ -34,7 +34,7 @@
                         <Font name="System Bold" size="12.0" />
                     </font>
                 </Button>
-                <Label layoutX="138.0" layoutY="96.0" prefHeight="30.0" prefWidth="45.0" text="name">
+                <Label layoutX="138.0" layoutY="96.0" prefHeight="30.0" prefWidth="45.0" text="goodName">
                     <font>
                         <Font name="Tahoma" size="16.0" />
                     </font>

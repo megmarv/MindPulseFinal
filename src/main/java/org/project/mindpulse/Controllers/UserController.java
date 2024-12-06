@@ -61,7 +61,7 @@ public class UserController extends UserHandler implements GeneralFeatures{
             displayError("username or password cannot be empty ! ");
         }
 
-        if (userExists(username)) {  // Check if the user exists
+        if (doesUserExist(username)) {  // Check if the user exists
             if (userPasswordCorrect(username,password)) {  // Check if the password is correct
                 displayConfirmation("You have successfully logged in!");
 
@@ -110,13 +110,13 @@ public class UserController extends UserHandler implements GeneralFeatures{
         }
 
         // Check if user already exists
-        if (userExists(username)) {
+        if (doesUserExist(username)) {
             displayError("This username is already taken, please try something else! ");
             return;
         }
 
         // Attempt to create the user
-        if (createUser(name, email, username, password)) {
+        if (createNewUser(name, email, username, password)) {
             displayConfirmation("You have successfully created an account! You can login now");
             redirectToLogInPage(event); // Redirect to the login page after successful registration
         } else {
@@ -158,7 +158,7 @@ public class UserController extends UserHandler implements GeneralFeatures{
 
         // Get the HomeController instance and pass the user details
         HomeController homeController = loader.getController();
-        homeController.updateUserLabel(user.getName()); // Update the home screen with user's name
+        homeController.updateUserLabel(user.getGoodName()); // Update the home screen with user's name
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setTitle("Home");

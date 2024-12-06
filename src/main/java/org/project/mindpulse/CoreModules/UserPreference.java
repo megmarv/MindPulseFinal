@@ -7,40 +7,23 @@ public class UserPreference {
     private int dislikes;
     private int nullInteractions;
     private double timeSpent;
-    private double totalScore;
+    private double normalizedScore;
 
-
-    public UserPreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent, double totalScore) {
+    public UserPreference(int categoryId, int likes, int dislikes, int nullInteractions, double timeSpent, double normalizedScore) {
         this.categoryId = categoryId;
         this.likes = likes;
         this.dislikes = dislikes;
         this.nullInteractions = nullInteractions;
         this.timeSpent = timeSpent;
-        this.totalScore = totalScore;
+        this.normalizedScore = normalizedScore;
     }
 
-    public void addLike(int likes) {
-        this.likes += likes;
+    public double getNormalizedScore() {
+        return normalizedScore;
     }
 
-    public void addDislike(int dislikes) {
-        this.dislikes += dislikes;
-    }
-
-    public void addNullInteractions(int nullInteractions) {
-        this.nullInteractions += nullInteractions;
-    }
-
-    public void addTimeSpent(double timeSpent) {
-        this.timeSpent += timeSpent;
-    }
-
-    public double getTotalScore() {
-        return totalScore;
-    }
-
-    public void setTotalScore(double totalScore) {
-        this.totalScore = totalScore;
+    public void setNormalizedScore(double normalizedScore) {
+        this.normalizedScore = normalizedScore;
     }
 
     public double getTimeSpent() {

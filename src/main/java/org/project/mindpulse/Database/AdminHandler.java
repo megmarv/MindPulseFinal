@@ -6,9 +6,8 @@ import org.project.mindpulse.CoreModules.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 
-public class AdminHandler extends DatabaseHandler {
+public class AdminHandler extends DatabaseConnection {
 
     // Method to check if the admin password is correct
     public boolean isAdminPasswordCorrect(String password) {
@@ -26,7 +25,6 @@ public class AdminHandler extends DatabaseHandler {
         }
         return false; // Return false if the password does not match or an error occurs
     }
-
 
 
     public static void deleteArticle(int articleId) {
@@ -125,7 +123,5 @@ public class AdminHandler extends DatabaseHandler {
 
         return users;
     }
-
-
 
 }

@@ -3,13 +3,13 @@ package org.project.mindpulse.CoreModules;
 public class Individual {
 
     private int userId;
-    private String name;
+    private String goodName;
     private String username;
     private String password;
 
-    public Individual(int userId, String name, String username, String password) {
+    public Individual(int userId, String goodName, String username, String password) {
         this.userId = userId;
-        this.name = name;
+        this.goodName = goodName;
         this.username = username;
         this.password = password;
     }
@@ -22,12 +22,12 @@ public class Individual {
         this.userId = userId;
     }
 
-    public String getName() {
-        return name;
+    public String getGoodName() {
+        return goodName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setGoodName(String goodName) {
+        this.goodName = goodName;
     }
 
     public String getUsername() {

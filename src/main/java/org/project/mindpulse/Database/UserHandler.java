@@ -2,16 +2,15 @@ package org.project.mindpulse.Database;
 
 import org.project.mindpulse.CoreModules.User;
 import org.project.mindpulse.CoreModules.UserPreference;
-import org.project.mindpulse.CoreModules.Admin;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserHandler extends DatabaseHandler {
+public class UserHandler extends DatabaseConnection {
 
     // Method to check if a user exists for a given username
-    public boolean userExists(String username) {
+    public boolean doesUserExist(String username) {
         String query = "SELECT COUNT(*) FROM Users WHERE username = ? AND role = 'user'";
         try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -43,7 +42,7 @@ public class UserHandler extends DatabaseHandler {
     }
 
     // Method to create a new user in the database
-    public boolean createUser(String name, String email, String username, String password) {
+    public boolean createNewUser(String name, String email, String username, String password) {
         String query = "INSERT INTO Users (name, email, username, password, role) VALUES (?, ?, ?, ?, 'user')";
         try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -84,7 +83,7 @@ public class UserHandler extends DatabaseHandler {
     }
 
     // Method to populate all user preferences
-    public static List<UserPreference> getUserPreferences(User user) {
+    public static List<UserPreference> retrieveUserPreferences(User user) {
         List<UserPreference> userPreferences = new ArrayList<>();
         String query = """
             SELECT CategoryID, Likes, Dislikes, NullInteractions, TimeSpent, NormalizedScore

@@ -7,7 +7,7 @@
   <groupId>org.Project</groupId>
   <artifactId>MindPulse</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>MindPulse</name>
+  <goodName>MindPulse</goodName>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

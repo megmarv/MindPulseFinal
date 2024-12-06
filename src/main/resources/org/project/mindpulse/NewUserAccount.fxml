@@ -30,7 +30,7 @@
                         <Font name="Tahoma Bold" size="17.0" />
                     </font>
                 </Label>
-                <TextField fx:id="nameForRegister" layoutX="65.0" layoutY="70.0" prefHeight="30.0" prefWidth="220.0" promptText="First name" styleClass="textfield">
+                <TextField fx:id="nameForRegister" layoutX="65.0" layoutY="70.0" prefHeight="30.0" prefWidth="220.0" promptText="First goodName" styleClass="textfield">
                     <font>
                         <Font size="14.0" />
                     </font>

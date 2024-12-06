@@ -7,14 +7,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import org.project.mindpulse.CoreModules.User;
 import org.project.mindpulse.Database.ArticleHandler;
-import org.project.mindpulse.Database.UserHandler;
 
 import java.io.IOException;
 
@@ -54,7 +51,7 @@ public class UserProfileController {
 
         // Get the HomeController instance and pass the user details
         HomeController homeController = loader.getController();
-        homeController.updateUserLabel(user.getName()); // Update the home screen with user's name
+        homeController.updateUserLabel(user.getGoodName()); // Update the home screen with user's name
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setTitle("Home");

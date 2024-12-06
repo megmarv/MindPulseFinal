@@ -84,12 +84,49 @@ public class AddNewArticleController implements GeneralFeatures{
     }
 
     private String assignCategory(String content) {
-        String[] sportsKeywords = {"football", "cricket", "basketball", "tournament"};
-        String[] entertainmentKeywords = {"movie", "series", "celebrity", "festival"};
-        String[] healthKeywords = {"health", "fitness", "medicine", "wellness"};
-        String[] businessKeywords = {"economy", "business", "stock", "market"};
-        String[] politicsKeywords = {"election", "policy", "government", "politics"};
-        String[] educationKeywords = {"school", "university", "education", "learning"};
+
+        String[] sportsKeywords = {
+                "football", "soccer", "cricket", "basketball", "tennis", "hockey", "golf", "rugby",
+                "swimming", "athletics", "marathon", "volleyball", "badminton", "cycling", "wrestling",
+                "boxing", "skiing", "skating", "surfing", "karate", "taekwondo", "tournament", "championship",
+                "olympics", "league", "match", "goal", "score", "team", "coach"
+        };
+
+        String[] entertainmentKeywords = {
+                "movie", "series", "film", "celebrity", "actor", "actress", "director", "producer",
+                "festival", "award", "music", "concert", "album", "theater", "performance", "comedy",
+                "drama", "romance", "horror", "blockbuster", "premiere", "documentary", "trailer",
+                "streaming", "Netflix", "Disney", "Bollywood", "Hollywood", "show", "cinema"
+        };
+
+        String[] healthKeywords = {
+                "health", "fitness", "medicine", "wellness", "nutrition", "diet", "exercise", "yoga",
+                "mental health", "therapy", "clinic", "hospital", "doctor", "nurse", "disease", "virus",
+                "vaccine", "symptoms", "treatment", "surgery", "diagnosis", "immune", "exercise", "workout",
+                "hygiene", "prevention", "COVID", "meditation", "healthcare", "recovery", "sleep"
+        };
+
+        String[] businessKeywords = {
+                "economy", "business", "stock", "market", "investment", "finance", "entrepreneur", "startup",
+                "corporate", "company", "revenue", "profit", "loss", "strategy", "management", "leadership",
+                "trade", "growth", "merger", "acquisition", "industry", "innovation", "capital", "shareholder",
+                "marketing", "sales", "e-commerce", "global", "business plan", "income", "tax"
+        };
+
+        String[] politicsKeywords = {
+                "election", "policy", "government", "politics", "president", "minister", "legislation", "senate",
+                "parliament", "democracy", "voting", "campaign", "law", "rights", "constitution", "political",
+                "debate", "diplomacy", "reform", "candidate", "governor", "mayor", "council", "agenda",
+                "international", "party", "congress", "administration", "national security", "budget"
+        };
+
+        String[] educationKeywords = {
+                "school", "university", "education", "learning", "student", "teacher", "classroom", "curriculum",
+                "exam", "assignment", "degree", "scholarship", "tuition", "college", "lecture", "syllabus",
+                "e-learning", "textbook", "academic", "research", "study", "assessment", "quiz", "online class",
+                "graduation", "library", "knowledge", "education policy", "principal", "campus"
+        };
+
 
         if (containsAny(content, sportsKeywords)) return "Sports";
         if (containsAny(content, entertainmentKeywords)) return "Entertainment";

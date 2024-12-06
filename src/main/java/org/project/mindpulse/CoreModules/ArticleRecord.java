@@ -24,14 +24,6 @@ public class ArticleRecord {
         this(interactionId, articleID, categoryId, userId, liked, disliked, parseIntervalToMillis(timeTakenInterval));
     }
 
-    private static long parseIntervalToMillis(String interval) {
-        String[] parts = interval.split(":");
-        int hours = Integer.parseInt(parts[0]);
-        int minutes = Integer.parseInt(parts[1]);
-        int seconds = Integer.parseInt(parts[2]);
-        return (hours * 3600 + minutes * 60 + seconds) * 1000L;
-    }
-
     public long getTimeTakenMillis() {
         return timeTakenMillis;
     }
@@ -94,16 +86,13 @@ public class ArticleRecord {
         return seconds + " seconds";
     }
 
-    @Override
-    public String toString() {
-        return "ArticleRecord{" +
-                "interactionId=" + interactionId +
-                ", articleID=" + articleID +
-                ", categoryId=" + categoryId +
-                ", userId=" + userId +
-                ", liked=" + liked +
-                ", disliked=" + disliked +
-                ", timeTakenMillis=" + timeTakenMillis +
-                '}';
+    private static long parseIntervalToMillis(String interval) {
+        String[] parts = interval.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = Integer.parseInt(parts[2]);
+        return (hours * 3600 + minutes * 60 + seconds) * 1000L;
     }
+
+
 }

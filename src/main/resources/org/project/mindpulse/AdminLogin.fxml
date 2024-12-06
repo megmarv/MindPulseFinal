@@ -43,7 +43,7 @@
                         <Font name="Tahoma Bold" size="17.0" />
                     </font>
                 </Label>
-            <Button fx:id="backToMain" layoutX="119.0" layoutY="342.0" mnemonicParsing="false" onAction="#backToMain" prefHeight="26.0" prefWidth="111.0" styleClass="login-btn" text="Back" />
+            <Button fx:id="backToLobby" layoutX="119.0" layoutY="342.0" mnemonicParsing="false" onAction="#backToMain" prefHeight="26.0" prefWidth="111.0" styleClass="login-btn" text="Back" />
             </children>
         </AnchorPane>
     </children>

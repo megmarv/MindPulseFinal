@@ -10,11 +10,9 @@ import java.util.stream.Collectors;
 
 public class RecommendationEngine {
 
-    private static final int INTERACTION_THRESHOLD = 5;
-
     public static List<Article> recommendArticles(User user) {
         // Step 1: Retrieve user preferences
-        List<UserPreference> preferences = UserHandler.getUserPreferences(user);
+        List<UserPreference> preferences = UserHandler.retrieveUserPreferences(user);
 
         // Step 2: Determine the top category based on NormalizedScore
         if (preferences.isEmpty()) {
@@ -22,7 +20,7 @@ public class RecommendationEngine {
             return Collections.emptyList();
         }
 
-        preferences.sort(Comparator.comparingDouble(UserPreference::getTotalScore).reversed());
+        preferences.sort(Comparator.comparingDouble(UserPreference::getNormalizedScore).reversed());
         int topCategoryId = preferences.get(0).getCategoryId();
         System.out.println("Top category for recommendation: " + topCategoryId);
 
@@ -30,7 +28,7 @@ public class RecommendationEngine {
         List<Article> categoryArticles = ArticleHandler.getArticlesForCategory(topCategoryId);
 
         // Step 4: Fetch user's article history
-        List<Article> userHistory = ArticleHandler.getUserArticlesForRecommendation(user);
+        List<Article> userHistory = ArticleHandler.getUserArticlesForRecommendationEngine(user);
 
         // Step 5: Compute similarity and skip already interacted articles
         Map<Article, Double> similarityMap = new HashMap<>();

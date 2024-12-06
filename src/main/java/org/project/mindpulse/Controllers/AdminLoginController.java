@@ -23,7 +23,7 @@ public class AdminLoginController extends AdminHandler implements GeneralFeature
     @FXML private PasswordField password;
 
     @FXML private Button loginButton;
-    @FXML private Button backToMain;
+    @FXML private Button backToLobby;
     @FXML private Button exitButton;
 
     @FXML
@@ -67,7 +67,7 @@ public class AdminLoginController extends AdminHandler implements GeneralFeature
 
     @FXML
     private void backToMain(ActionEvent event) throws IOException {
-        loadScene(event,"/org/project/mindpulse/AdminPage.fxml","MindPulse",600,400);
+        loadScene(event,"/org/project/mindpulse/FirstPage.fxml","MindPulse",600,400);
     }
 
     public void loadScene(ActionEvent event, String fxmlPath, String title, int width, int height) throws IOException {

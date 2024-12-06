@@ -2,18 +2,16 @@ package org.project.mindpulse.Database;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.project.mindpulse.Controllers.UserController;
 import org.project.mindpulse.CoreModules.Article;
 import org.project.mindpulse.CoreModules.ArticleRecord;
 import org.project.mindpulse.CoreModules.Category;
 import org.project.mindpulse.CoreModules.User;
-import org.project.mindpulse.Service.RecommendationEngine;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArticleHandler extends DatabaseHandler {
+public class ArticleHandler extends DatabaseConnection {
 
     // Method to save an article interaction into the database
     public void saveInteractionToDatabase(ArticleRecord interaction) {
@@ -62,9 +60,8 @@ public class ArticleHandler extends DatabaseHandler {
         return -1;
     }
 
-
-    // Refactor of retrieveAllArticles() method to correctly handle the ResultSet and add articles to static list
-    public static ObservableList<Article> retrieveAllArticles() {
+    // Refactor of getArticlesForTableView() method to correctly handle the ResultSet and add articles to static list
+    public static ObservableList<Article> getArticlesForTableView() {
         System.out.println("Retrieving all articles from the database...");
 
         String query = "SELECT * FROM articles"; // Query to retrieve all articles
@@ -95,7 +92,6 @@ public class ArticleHandler extends DatabaseHandler {
 
         return observableArticleList; // Return the observable list
     }
-
 
 
     public static List<Article> getArticlesForCategory(int categoryId) {
@@ -151,7 +147,7 @@ public class ArticleHandler extends DatabaseHandler {
     }
 
 
-    public static List<Article> getUserArticlesForRecommendation(User user) {
+    public static List<Article> getUserArticlesForRecommendationEngine(User user) {
         List<Article> userArticles = new ArrayList<>();
         String query = """
         SELECT ai.articleId, ai.categoryId, a.title, a.authorName, a.content, a.dateOfPublish

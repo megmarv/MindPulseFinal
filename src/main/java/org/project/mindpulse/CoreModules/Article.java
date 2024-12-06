@@ -15,7 +15,6 @@ public class Article {
 
     private Category category; // aggregation between category and article
     private List<ArticleRecord> articleHistory = new ArrayList<>(); // composition relationship between article and articleRecord but never used
-    public static List<Article> articleList = new ArrayList<>(); // Static list for holding all articles
 
     public Article(int articleId, int categoryId, String title, String authorName, String content, Date dateOfPublish) {
         this.articleId = articleId;
@@ -96,17 +95,9 @@ public class Article {
         return category;
     }
 
-    public String getCategoryNameById(int categoryId, List<Category> categories) {
-        for (Category category : categories) {
-            if (category.getCategoryID() == categoryId) {
-                return category.getCategoryName();
-            }
-        }
-        return "Unknown Category"; // Return a default value if not found
-    }
-
     public void setArticleHistory(List<ArticleRecord> articleHistory) {
         this.articleHistory = articleHistory;
     }
+
 }
 
